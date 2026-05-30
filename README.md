@@ -43,24 +43,28 @@ src/
 | --------------------- | ---------------------------------------- |
 | `npm install`         | Install dependencies                     |
 | `npm run dev`         | Start the dev server at `localhost:4321` |
-| `npm run build`       | Build the production site to `./dist/`   |
+| `npm run build`       | Build the production site to `./docs/`   |
 | `npm run preview`     | Preview the production build locally     |
 | `npm run astro check` | Type-check Astro, MDX and TS files       |
 
 ## Deployment (GitHub Pages)
 
-The site is deployed to **GitHub Pages** at
-`https://nadavzoh.github.io/blog/` by the workflow in
-[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml).
+The site is hosted on **GitHub Pages** at `https://nadavzoh.github.io/blog/`
+using the **"Deploy from a branch"** source (no build runs on GitHub).
 
-Because it is a *project* site served from the `/blog/` sub-path, `astro.config.mjs`
-sets `site` and `base: '/blog'`. Posts can still use clean root-relative links
+Because Pages serves prebuilt static files directly from the branch,
+`npm run build` outputs the site into the committed **`docs/`** folder
+(`outDir: './docs'` in `astro.config.mjs`), and an empty `docs/.nojekyll`
+keeps GitHub from stripping the `_astro/` asset directory.
+
+It is a *project* site served from the `/blog/` sub-path, so `astro.config.mjs`
+sets `site` and `base: '/blog/'`. Posts can still use clean root-relative links
 (e.g. `/posts/...`); a small rehype plugin rewrites them to include the base at
 build time.
 
-To enable it once on GitHub: open **Settings → Pages**, set **Source** to
-**GitHub Actions**. Every push to the `main` branch then builds and publishes the
-site automatically (you can also trigger it manually from the **Actions** tab).
+**To publish changes:** run `npm run build`, then commit the updated `docs/`
+folder. In **Settings → Pages**, the source is set to this branch with the
+**`/docs`** folder.
 
 ## How the interactivity works
 

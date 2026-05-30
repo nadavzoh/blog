@@ -38,6 +38,9 @@ function rehypeBaseLinks() {
 export default defineConfig({
   site: 'https://nadavzoh.github.io',
   base: `${BASE}/`,
+  // GitHub Pages is configured to "Deploy from a branch" and serve the site
+  // from the /docs folder, so build the static output straight into ./docs.
+  outDir: './docs',
   integrations: [
     mdx(),
     react(),
