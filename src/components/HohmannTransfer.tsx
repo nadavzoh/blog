@@ -54,17 +54,17 @@ export default function HohmannTransfer() {
     >
       <svg
         viewBox="0 0 400 320"
-        style={{ width: '100%', height: 'auto', background: '#050714', borderRadius: '0.75rem' }}
+        style={{ width: '100%', height: 'auto', background: '#0a0a0a', borderRadius: '0.75rem' }}
       >
         {/* inner (start) orbit */}
-        <circle cx={cx} cy={cy} r={innerR} fill="none" stroke="#6c7cff" strokeWidth={1.5} />
+        <circle cx={cx} cy={cy} r={innerR} fill="none" stroke="#3b82f6" strokeWidth={1.5} />
         {/* outer (target) orbit */}
         <circle
           cx={cx}
           cy={cy}
           r={outerR}
           fill="none"
-          stroke="#2cb5a8"
+          stroke="#14b8a6"
           strokeWidth={1.5}
           strokeDasharray="4 4"
         />
@@ -75,30 +75,30 @@ export default function HohmannTransfer() {
           rx={a}
           ry={b}
           fill="none"
-          stroke="#e7ecff"
+          stroke="#ededed"
           strokeWidth={1.5}
           strokeDasharray="2 5"
         />
         {/* planet at the focus */}
-        <circle cx={cx} cy={cy} r={10} fill="#8b9dff" />
+        <circle cx={cx} cy={cy} r={10} fill="#60a5fa" />
 
         {/* burn markers */}
-        <circle cx={cx + innerR} cy={cy} r={4} fill="#ffd166" />
-        <text x={cx + innerR + 6} y={cy + 4} fill="#ffd166" fontSize={10}>
+        <circle cx={cx + innerR} cy={cy} r={4} fill="#fbbf24" />
+        <text x={cx + innerR + 6} y={cy + 4} fill="#fbbf24" fontSize={10}>
           burn 1
         </text>
-        <circle cx={cx - outerR} cy={cy} r={4} fill="#ffd166" />
-        <text x={cx - outerR - 44} y={cy + 4} fill="#ffd166" fontSize={10}>
+        <circle cx={cx - outerR} cy={cy} r={4} fill="#fbbf24" />
+        <text x={cx - outerR - 44} y={cy + 4} fill="#fbbf24" fontSize={10}>
           burn 2
         </text>
 
         {/* spacecraft */}
-        <motion.circle cx={craftX} cy={craftY} r={5} fill="#4fd1c5" />
+        <motion.circle cx={craftX} cy={craftY} r={5} fill="#2dd4bf" />
       </svg>
 
-      <div style={{ marginTop: '0.9rem', color: '#aab4d4', fontSize: '0.9rem' }}>
+      <div style={{ marginTop: '0.9rem', color: '#a1a1a1', fontSize: '0.9rem' }}>
         Target orbit radius:{' '}
-        <strong style={{ color: '#8b9dff' }}>{(outerR / innerR).toFixed(2)}×</strong> the starting
+        <strong style={{ color: '#60a5fa' }}>{(outerR / innerR).toFixed(2)}×</strong> the starting
         orbit
       </div>
       <input
@@ -108,7 +108,7 @@ export default function HohmannTransfer() {
         step={1}
         value={outerR}
         onChange={(e) => setOuterR(parseFloat(e.target.value))}
-        style={{ width: '100%', accentColor: '#2cb5a8', marginTop: '0.4rem' }}
+        style={{ width: '100%', accentColor: '#14b8a6', marginTop: '0.4rem' }}
         aria-label="Target orbit radius"
       />
 
@@ -118,14 +118,14 @@ export default function HohmannTransfer() {
           display: 'flex',
           gap: '1.5rem',
           fontSize: '0.85rem',
-          color: '#aab4d4',
+          color: '#a1a1a1',
         }}
       >
         <span>
-          Burn 1 (speed up): <strong style={{ color: '#ffd166' }}>+{dv1}</strong>
+          Burn 1 (speed up): <strong style={{ color: '#fbbf24' }}>+{dv1}</strong>
         </span>
         <span>
-          Burn 2 (circularise): <strong style={{ color: '#ffd166' }}>+{dv2}</strong>
+          Burn 2 (circularise): <strong style={{ color: '#fbbf24' }}>+{dv2}</strong>
         </span>
       </div>
     </InteractiveCard>

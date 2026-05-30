@@ -92,7 +92,7 @@ export default function OrbitSimulator() {
       ctx.clearRect(0, 0, W, H);
 
       // starfield
-      ctx.fillStyle = 'rgba(231,236,255,0.35)';
+      ctx.fillStyle = 'rgba(237,237,237,0.3)';
       for (let i = 0; i < 40; i++) {
         const sx = (i * 97) % W;
         const sy = (i * 53) % H;
@@ -105,14 +105,14 @@ export default function OrbitSimulator() {
         if (i === 0) ctx.moveTo(p.x, p.y);
         else ctx.lineTo(p.x, p.y);
       });
-      ctx.strokeStyle = 'rgba(79,209,197,0.6)';
+      ctx.strokeStyle = 'rgba(45,212,191,0.6)';
       ctx.lineWidth = 1.5;
       ctx.stroke();
 
       // planet
       const grad = ctx.createRadialGradient(cx - 12, cy - 12, 6, cx, cy, planetR);
-      grad.addColorStop(0, '#6c7cff');
-      grad.addColorStop(1, '#111634');
+      grad.addColorStop(0, '#3b82f6');
+      grad.addColorStop(1, '#1f1f1f');
       ctx.beginPath();
       ctx.arc(cx, cy, planetR, 0, Math.PI * 2);
       ctx.fillStyle = grad;
@@ -122,12 +122,12 @@ export default function OrbitSimulator() {
       if (!crashed) {
         ctx.beginPath();
         ctx.arc(x, y, 4, 0, Math.PI * 2);
-        ctx.fillStyle = '#e7ecff';
+        ctx.fillStyle = '#ededed';
         ctx.fill();
       }
 
       // status text
-      ctx.fillStyle = '#aab4d4';
+      ctx.fillStyle = '#a1a1a1';
       ctx.font = '13px system-ui, sans-serif';
       const label = crashed
         ? '💥 Too slow — it crashed back down.'
@@ -155,13 +155,13 @@ export default function OrbitSimulator() {
           width: '100%',
           height: 'auto',
           borderRadius: '0.75rem',
-          background: '#050714',
+          background: '#0a0a0a',
           display: 'block',
         }}
       />
 
-      <div style={{ marginTop: '0.9rem', color: '#aab4d4', fontSize: '0.9rem' }}>
-        Launch speed: <strong style={{ color: '#8b9dff' }}>{speed.toFixed(1)}</strong> units
+      <div style={{ marginTop: '0.9rem', color: '#a1a1a1', fontSize: '0.9rem' }}>
+        Launch speed: <strong style={{ color: '#60a5fa' }}>{speed.toFixed(1)}</strong> units
       </div>
       <input
         type="range"
@@ -173,7 +173,7 @@ export default function OrbitSimulator() {
           setSpeed(parseFloat(e.target.value));
           relaunch();
         }}
-        style={{ width: '100%', accentColor: '#6c7cff', marginTop: '0.4rem' }}
+        style={{ width: '100%', accentColor: '#3b82f6', marginTop: '0.4rem' }}
         aria-label="Launch speed"
       />
 
@@ -195,9 +195,9 @@ export default function OrbitSimulator() {
 const btnStyle: React.CSSProperties = {
   padding: '0.4rem 0.9rem',
   borderRadius: '0.5rem',
-  border: '1px solid #1b2147',
-  background: '#111634',
-  color: '#e7ecff',
+  border: '1px solid #262626',
+  background: '#1f1f1f',
+  color: '#ededed',
   fontSize: '0.85rem',
   cursor: 'pointer',
 };

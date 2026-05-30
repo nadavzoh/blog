@@ -35,8 +35,8 @@ export default function LagrangePoints() {
   const l4Y = cy - (R * Math.sqrt(3)) / 2;
   const l5Y = cy + (R * Math.sqrt(3)) / 2;
 
-  const pointStyle = { fill: '#ffd166', stroke: 'none' } as const;
-  const labelStyle = { fill: '#ffd166', fontSize: 11 } as const;
+  const pointStyle = { fill: '#fbbf24', stroke: 'none' } as const;
+  const labelStyle = { fill: '#fbbf24', fontSize: 11 } as const;
 
   return (
     <InteractiveCard
@@ -45,21 +45,21 @@ export default function LagrangePoints() {
     >
       <svg
         viewBox="0 0 420 320"
-        style={{ width: '100%', height: 'auto', background: '#050714', borderRadius: '0.75rem' }}
+        style={{ width: '100%', height: 'auto', background: '#0a0a0a', borderRadius: '0.75rem' }}
       >
         {/* secondary's orbit around the primary */}
-        <circle cx={cx} cy={cy} r={R} fill="none" stroke="#1b2147" strokeWidth={1.5} />
+        <circle cx={cx} cy={cy} r={R} fill="none" stroke="#262626" strokeWidth={1.5} />
 
         {/* line joining the two bodies (the collinear axis) */}
-        <line x1={l3X} y1={cy} x2={l2X} y2={cy} stroke="#111634" strokeWidth={1} />
+        <line x1={l3X} y1={cy} x2={l2X} y2={cy} stroke="#1f1f1f" strokeWidth={1} />
 
         {/* primary and secondary */}
-        <circle cx={cx} cy={cy} r={11} fill="#8b9dff" />
-        <text x={cx} y={cy + 26} fill="#aab4d4" fontSize={11} textAnchor="middle">
+        <circle cx={cx} cy={cy} r={11} fill="#60a5fa" />
+        <text x={cx} y={cy + 26} fill="#a1a1a1" fontSize={11} textAnchor="middle">
           primary
         </text>
-        <circle cx={planetX} cy={cy} r={6} fill="#4fd1c5" />
-        <text x={planetX} y={cy + 22} fill="#aab4d4" fontSize={11} textAnchor="middle">
+        <circle cx={planetX} cy={cy} r={6} fill="#2dd4bf" />
+        <text x={planetX} y={cy + 22} fill="#a1a1a1" fontSize={11} textAnchor="middle">
           secondary
         </text>
 
@@ -88,9 +88,9 @@ export default function LagrangePoints() {
         </text>
       </svg>
 
-      <div style={{ marginTop: '0.9rem', color: '#aab4d4', fontSize: '0.9rem' }}>
+      <div style={{ marginTop: '0.9rem', color: '#a1a1a1', fontSize: '0.9rem' }}>
         Mass ratio{' '}
-        <strong style={{ color: '#8b9dff' }}>
+        <strong style={{ color: '#60a5fa' }}>
           μ = {mu.toFixed(3)}
         </strong>{' '}
         — how heavy the secondary is compared with the whole system.
@@ -102,10 +102,10 @@ export default function LagrangePoints() {
         step={0.005}
         value={mu}
         onChange={(e) => setMu(parseFloat(e.target.value))}
-        style={{ width: '100%', accentColor: '#2cb5a8', marginTop: '0.4rem' }}
+        style={{ width: '100%', accentColor: '#14b8a6', marginTop: '0.4rem' }}
         aria-label="Secondary-to-total mass ratio"
       />
-      <div style={{ marginTop: '0.6rem', color: '#aab4d4', fontSize: '0.85rem' }}>
+      <div style={{ marginTop: '0.6rem', color: '#a1a1a1', fontSize: '0.85rem' }}>
         Heavier secondary → L1 and L2 push farther out from it, while L4 and L5
         stay locked at the 60° corners no matter what.
       </div>

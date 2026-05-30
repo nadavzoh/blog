@@ -35,12 +35,12 @@ export default function GravityWell() {
       title="The inverse-square law of gravity"
       subtitle="Move away from Earth and gravity weakens — fast."
     >
-      <div style={{ marginBottom: '0.75rem', color: '#aab4d4', fontSize: '0.9rem' }}>
+      <div style={{ marginBottom: '0.75rem', color: '#a1a1a1', fontSize: '0.9rem' }}>
         Distance from Earth's centre:{' '}
-        <strong style={{ color: '#8b9dff' }}>{distance.toFixed(2)} Earth radii</strong>
+        <strong style={{ color: '#60a5fa' }}>{distance.toFixed(2)} Earth radii</strong>
         {' · '}
         Gravity felt:{' '}
-        <strong style={{ color: '#4fd1c5' }}>{(currentForce * 100).toFixed(1)}%</strong> of
+        <strong style={{ color: '#2dd4bf' }}>{(currentForce * 100).toFixed(1)}%</strong> of
         surface
       </div>
 
@@ -51,33 +51,33 @@ export default function GravityWell() {
         step={0.25}
         value={distance}
         onChange={(e) => setDistance(parseFloat(e.target.value))}
-        style={{ width: '100%', accentColor: '#6c7cff', marginBottom: '1rem' }}
+        style={{ width: '100%', accentColor: '#3b82f6', marginBottom: '1rem' }}
         aria-label="Distance from Earth in Earth radii"
       />
 
       <div style={{ width: '100%', height: 240 }}>
         <ResponsiveContainer>
           <LineChart data={data} margin={{ top: 8, right: 16, bottom: 8, left: -8 }}>
-            <CartesianGrid stroke="#1b2147" strokeDasharray="3 3" />
+            <CartesianGrid stroke="#262626" strokeDasharray="3 3" />
             <XAxis
               dataKey="r"
-              stroke="#aab4d4"
+              stroke="#a1a1a1"
               tick={{ fontSize: 12 }}
               label={{
                 value: 'distance (Earth radii)',
                 position: 'insideBottom',
                 offset: -4,
-                fill: '#aab4d4',
+                fill: '#a1a1a1',
                 fontSize: 11,
               }}
             />
-            <YAxis stroke="#aab4d4" tick={{ fontSize: 12 }} domain={[0, 1]} />
+            <YAxis stroke="#a1a1a1" tick={{ fontSize: 12 }} domain={[0, 1]} />
             <Tooltip
               contentStyle={{
-                background: '#0a0f24',
-                border: '1px solid #111634',
+                background: '#0f0f0f',
+                border: '1px solid #1f1f1f',
                 borderRadius: 8,
-                color: '#e7ecff',
+                color: '#ededed',
               }}
               formatter={(value: number) => [`${(value * 100).toFixed(1)}%`, 'gravity']}
               labelFormatter={(label) => `r = ${label} Earth radii`}
@@ -85,11 +85,11 @@ export default function GravityWell() {
             <Line
               type="monotone"
               dataKey="force"
-              stroke="#6c7cff"
+              stroke="#3b82f6"
               strokeWidth={2.5}
               dot={false}
             />
-            <ReferenceDot x={distance} y={currentForce} r={6} fill="#4fd1c5" stroke="none" />
+            <ReferenceDot x={distance} y={currentForce} r={6} fill="#2dd4bf" stroke="none" />
           </LineChart>
         </ResponsiveContainer>
       </div>

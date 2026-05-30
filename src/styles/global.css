@@ -1,17 +1,26 @@
 @import 'tailwindcss';
 @import 'katex/dist/katex.min.css';
 
-/* Tailwind v4 theme tokens for the space/orbit aesthetic */
+/* Tailwind v4 theme tokens — clean, neutral, Vercel/shadcn-inspired palette. */
 @theme {
-  --color-void-950: #050714;
-  --color-void-900: #0a0f24;
-  --color-void-800: #111634;
-  --color-nebula-400: #8b9dff;
-  --color-nebula-500: #6c7cff;
-  --color-aurora-400: #4fd1c5;
-  --color-aurora-500: #2cb5a8;
-  --color-star-200: #e7ecff;
-  --color-star-400: #aab4d4;
+  /* Surfaces: near-black page with subtle neutral steps. */
+  --color-surface-950: #0a0a0a;
+  --color-surface-900: #111111;
+  --color-surface-800: #1a1a1a;
+  --color-surface-700: #262626;
+  --color-surface-600: #404040;
+
+  /* Text: high-contrast neutral ink. */
+  --color-ink-50: #ededed;
+  --color-ink-200: #d4d4d4;
+  --color-ink-400: #a1a1a1;
+
+  /* Accents: a single restrained blue plus a teal for data. */
+  --color-accent-400: #60a5fa;
+  --color-accent-500: #3b82f6;
+  --color-teal-400: #2dd4bf;
+  --color-teal-500: #14b8a6;
+  --color-amber-400: #fbbf24;
 
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
 }
@@ -22,15 +31,14 @@ html {
 }
 
 body {
-  background:
-    radial-gradient(1200px 600px at 80% -10%, rgba(108, 124, 255, 0.18), transparent 60%),
-    radial-gradient(900px 500px at 0% 10%, rgba(79, 209, 197, 0.12), transparent 55%),
-    var(--color-void-950);
-  color: var(--color-star-200);
+  background: var(--color-surface-950);
+  color: var(--color-ink-50);
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-/* Subtle starfield */
+/* Very subtle starfield — kept faint so it reads as texture, not decoration. */
 .starfield::before {
   content: '';
   position: fixed;
@@ -38,11 +46,11 @@ body {
   z-index: -1;
   pointer-events: none;
   background-image:
-    radial-gradient(1px 1px at 20% 30%, rgba(255, 255, 255, 0.7), transparent),
-    radial-gradient(1px 1px at 70% 60%, rgba(255, 255, 255, 0.5), transparent),
-    radial-gradient(1.5px 1.5px at 40% 80%, rgba(255, 255, 255, 0.6), transparent),
-    radial-gradient(1px 1px at 90% 20%, rgba(255, 255, 255, 0.5), transparent),
-    radial-gradient(1px 1px at 50% 50%, rgba(255, 255, 255, 0.4), transparent);
+    radial-gradient(1px 1px at 20% 30%, rgba(255, 255, 255, 0.18), transparent),
+    radial-gradient(1px 1px at 70% 60%, rgba(255, 255, 255, 0.12), transparent),
+    radial-gradient(1px 1px at 40% 80%, rgba(255, 255, 255, 0.14), transparent),
+    radial-gradient(1px 1px at 90% 20%, rgba(255, 255, 255, 0.12), transparent),
+    radial-gradient(1px 1px at 50% 50%, rgba(255, 255, 255, 0.1), transparent);
   background-size: 100% 100%;
 }
 
@@ -54,9 +62,10 @@ body {
 .prose h1,
 .prose h2,
 .prose h3 {
-  color: var(--color-star-200);
+  color: var(--color-ink-50);
   font-weight: 700;
   line-height: 1.2;
+  letter-spacing: -0.01em;
   margin-top: 2.2rem;
   margin-bottom: 0.9rem;
 }
@@ -68,15 +77,16 @@ body {
 }
 .prose p {
   margin: 1rem 0;
-  color: var(--color-star-200);
+  color: var(--color-ink-200);
 }
 .prose a {
-  color: var(--color-nebula-400);
+  color: var(--color-accent-400);
   text-decoration: underline;
   text-underline-offset: 3px;
+  transition: color 0.15s ease;
 }
 .prose a:hover {
-  color: var(--color-aurora-400);
+  color: var(--color-accent-500);
 }
 .prose ul,
 .prose ol {
@@ -85,6 +95,7 @@ body {
 }
 .prose li {
   margin: 0.4rem 0;
+  color: var(--color-ink-200);
 }
 .prose ul {
   list-style: disc;
@@ -93,23 +104,24 @@ body {
   list-style: decimal;
 }
 .prose strong {
-  color: var(--color-star-200);
+  color: var(--color-ink-50);
 }
 .prose code {
-  background: var(--color-void-800);
+  background: var(--color-surface-800);
+  border: 1px solid var(--color-surface-700);
   padding: 0.15rem 0.4rem;
   border-radius: 0.35rem;
   font-size: 0.9em;
 }
 .prose blockquote {
-  border-left: 3px solid var(--color-nebula-500);
+  border-left: 2px solid var(--color-surface-600);
   padding-left: 1rem;
   margin: 1.2rem 0;
-  color: var(--color-star-400);
+  color: var(--color-ink-400);
   font-style: italic;
 }
 .prose hr {
   border: none;
-  border-top: 1px solid var(--color-void-800);
+  border-top: 1px solid var(--color-surface-800);
   margin: 2.5rem 0;
 }

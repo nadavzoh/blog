@@ -59,9 +59,9 @@ export default function KeplerThirdLaw() {
         style={{
           padding: '0.4rem 0.9rem',
           borderRadius: '0.5rem',
-          border: '1px solid #1b2147',
-          background: logScale ? '#6c7cff' : '#111634',
-          color: '#e7ecff',
+          border: '1px solid #262626',
+          background: logScale ? '#3b82f6' : '#1f1f1f',
+          color: '#ededed',
           fontSize: '0.85rem',
           cursor: 'pointer',
           marginBottom: '0.9rem',
@@ -76,24 +76,24 @@ export default function KeplerThirdLaw() {
             data={lineData}
             margin={{ top: 8, right: 16, bottom: 16, left: -4 }}
           >
-            <CartesianGrid stroke="#1b2147" strokeDasharray="3 3" />
+            <CartesianGrid stroke="#262626" strokeDasharray="3 3" />
             <XAxis
               type="number"
               dataKey="x"
-              stroke="#aab4d4"
+              stroke="#a1a1a1"
               tick={{ fontSize: 12 }}
               domain={['auto', 'auto']}
               label={{
                 value: logScale ? 'log₁₀(a / AU)' : 'a — semi-major axis (AU)',
                 position: 'insideBottom',
                 offset: -8,
-                fill: '#aab4d4',
+                fill: '#a1a1a1',
                 fontSize: 11,
               }}
             />
             <YAxis
               type="number"
-              stroke="#aab4d4"
+              stroke="#a1a1a1"
               tick={{ fontSize: 12 }}
               domain={['auto', 'auto']}
               label={{
@@ -101,16 +101,16 @@ export default function KeplerThirdLaw() {
                 angle: -90,
                 position: 'insideLeft',
                 offset: 16,
-                fill: '#aab4d4',
+                fill: '#a1a1a1',
                 fontSize: 11,
               }}
             />
             <Tooltip
               contentStyle={{
-                background: '#0a0f24',
-                border: '1px solid #111634',
+                background: '#0f0f0f',
+                border: '1px solid #1f1f1f',
                 borderRadius: 8,
-                color: '#e7ecff',
+                color: '#ededed',
               }}
               formatter={(value: number, name: string) => [value.toFixed(3), name]}
             />
@@ -118,7 +118,7 @@ export default function KeplerThirdLaw() {
               type="monotone"
               dataKey="y"
               data={lineData}
-              stroke="#4fd1c5"
+              stroke="#2dd4bf"
               strokeWidth={2}
               dot={false}
               name="T = a^1.5"
@@ -127,7 +127,7 @@ export default function KeplerThirdLaw() {
             <Scatter
               data={scatterData}
               dataKey="y"
-              fill="#8b9dff"
+              fill="#60a5fa"
               name="planets"
               isAnimationActive={false}
             />
@@ -135,7 +135,7 @@ export default function KeplerThirdLaw() {
         </ResponsiveContainer>
       </div>
 
-      <p style={{ marginTop: '0.6rem', fontSize: '0.8rem', color: '#aab4d4' }}>
+      <p style={{ marginTop: '0.6rem', fontSize: '0.8rem', color: '#a1a1a1' }}>
         Dots are the eight planets; the teal curve is the prediction T = a<sup>3/2</sup>.
       </p>
     </InteractiveCard>

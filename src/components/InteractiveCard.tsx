@@ -31,15 +31,15 @@ export default function InteractiveCard({ title, subtitle, children }: Interacti
         margin: '2rem 0',
         padding: '1.25rem',
         borderRadius: '1rem',
-        border: '1px solid #111634',
-        background: 'linear-gradient(180deg, rgba(17,22,52,0.7), rgba(10,15,36,0.7))',
-        boxShadow: '0 10px 40px -20px rgba(108,124,255,0.45)',
+        border: '1px solid #1f1f1f',
+        background: 'linear-gradient(180deg, rgba(23,23,23,0.85), rgba(10,10,10,0.85))',
+        boxShadow: '0 10px 40px -20px rgba(0,0,0,0.6)',
       }}
     >
       <figcaption style={{ marginBottom: '1rem' }}>
-        <div style={{ fontWeight: 700, fontSize: '1.05rem', color: '#e7ecff' }}>{title}</div>
+        <div style={{ fontWeight: 700, fontSize: '1.05rem', color: '#ededed' }}>{title}</div>
         {subtitle ? (
-          <div style={{ fontSize: '0.85rem', color: '#aab4d4', marginTop: '0.2rem' }}>
+          <div style={{ fontSize: '0.85rem', color: '#a1a1a1', marginTop: '0.2rem' }}>
             {subtitle}
           </div>
         ) : null}

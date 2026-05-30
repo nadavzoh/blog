@@ -12,7 +12,7 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort(
     <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
       A friendly tour of orbital physics
     </h1>
-    <p class="mt-4 max-w-2xl text-lg text-star-400">
+    <p class="mt-4 max-w-2xl text-lg text-ink-400">
       No physics degree required. We start from <em>"what even is gravity?"</em> and build,
       one post at a time, to how spacecraft actually move between worlds — with
       interactive simulations you can poke at along the way.
@@ -20,7 +20,7 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort(
   </section>
 
   <section>
-    <h2 class="mb-5 text-sm font-semibold uppercase tracking-wider text-aurora-400">
+    <h2 class="mb-5 text-sm font-semibold uppercase tracking-wider text-teal-400">
       The series
     </h2>
     <ol class="space-y-4">
@@ -29,20 +29,20 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort(
           <li>
             <a
               href={`${import.meta.env.BASE_URL}posts/${post.id}/`}
-              class="group block rounded-xl border border-void-800 bg-void-900/50 p-5 transition hover:border-nebula-500/60 hover:bg-void-800/50"
+              class="group block rounded-xl border border-surface-800 bg-surface-900/50 p-5 transition hover:border-surface-600 hover:bg-surface-800/50"
             >
               <div class="flex items-baseline gap-3">
-                <span class="text-sm font-bold text-nebula-400">
+                <span class="text-sm font-bold text-accent-400">
                   {String(post.data.order).padStart(2, '0')}
                 </span>
-                <h3 class="text-lg font-bold text-star-200 transition group-hover:text-nebula-400">
+                <h3 class="text-lg font-bold text-ink-50 transition group-hover:text-accent-400">
                   {post.data.title}
                 </h3>
               </div>
-              <p class="mt-1.5 pl-8 text-star-400">{post.data.description}</p>
+              <p class="mt-1.5 pl-8 text-ink-400">{post.data.description}</p>
               <div class="mt-2 flex flex-wrap gap-2 pl-8">
                 {post.data.tags.map((tag) => (
-                  <span class="rounded-full bg-void-800 px-2 py-0.5 text-xs text-star-400">
+                  <span class="rounded-full bg-surface-800 px-2 py-0.5 text-xs text-ink-400">
                     #{tag}
                   </span>
                 ))}

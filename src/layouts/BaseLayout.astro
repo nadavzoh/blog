@@ -28,13 +28,13 @@ const { title, description = 'Explanatory posts on space and orbital physics.' }
       <header class="flex items-center justify-between py-6">
         <a href={import.meta.env.BASE_URL} class="group flex items-center gap-2 text-lg font-bold tracking-tight">
           <span
-            class="inline-block h-3 w-3 rounded-full bg-nebula-400 shadow-[0_0_12px_3px_rgba(108,124,255,0.6)] transition group-hover:bg-aurora-400"
+            class="inline-block h-3 w-3 rounded-full bg-accent-500 shadow-[0_0_10px_2px_rgba(59,130,246,0.5)] transition group-hover:bg-accent-400"
           ></span>
           <span>Orbital Notes</span>
         </a>
-        <nav class="flex gap-5 text-sm text-star-400">
-          <a class="transition hover:text-star-200" href={import.meta.env.BASE_URL}>Home</a>
-          <a class="transition hover:text-star-200" href={`${import.meta.env.BASE_URL}about`}>About</a>
+        <nav class="flex gap-5 text-sm text-ink-400">
+          <a class="transition hover:text-ink-50" href={import.meta.env.BASE_URL}>Home</a>
+          <a class="transition hover:text-ink-50" href={`${import.meta.env.BASE_URL}about`}>About</a>
         </nav>
       </header>
 
@@ -42,7 +42,7 @@ const { title, description = 'Explanatory posts on space and orbital physics.' }
         <slot />
       </main>
 
-      <footer class="border-t border-void-800 py-8 text-sm text-star-400">
+      <footer class="border-t border-surface-800 py-8 text-sm text-ink-400">
         <p>
           Orbital Notes — a friendly tour of how things fly through space.
           Built with Astro, React islands & KaTeX.

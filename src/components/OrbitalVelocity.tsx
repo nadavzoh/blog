@@ -45,9 +45,9 @@ export default function OrbitalVelocity() {
             style={{
               padding: '0.35rem 0.8rem',
               borderRadius: '0.5rem',
-              border: '1px solid #1b2147',
-              background: i === bodyIndex ? '#6c7cff' : '#111634',
-              color: '#e7ecff',
+              border: '1px solid #262626',
+              background: i === bodyIndex ? '#3b82f6' : '#1f1f1f',
+              color: '#ededed',
               fontSize: '0.85rem',
               cursor: 'pointer',
             }}
@@ -57,8 +57,8 @@ export default function OrbitalVelocity() {
         ))}
       </div>
 
-      <div style={{ color: '#aab4d4', fontSize: '0.9rem', marginBottom: '0.4rem' }}>
-        Altitude above surface: <strong style={{ color: '#8b9dff' }}>{altitudeKm} km</strong>
+      <div style={{ color: '#a1a1a1', fontSize: '0.9rem', marginBottom: '0.4rem' }}>
+        Altitude above surface: <strong style={{ color: '#60a5fa' }}>{altitudeKm} km</strong>
       </div>
       <input
         type="range"
@@ -67,7 +67,7 @@ export default function OrbitalVelocity() {
         step={100}
         value={altitudeKm}
         onChange={(e) => setAltitudeKm(parseFloat(e.target.value))}
-        style={{ width: '100%', accentColor: '#6c7cff', marginBottom: '1.2rem' }}
+        style={{ width: '100%', accentColor: '#3b82f6', marginBottom: '1.2rem' }}
         aria-label="Altitude in kilometres"
       />
 
@@ -80,7 +80,7 @@ export default function OrbitalVelocity() {
           style={statBox}
         >
           <div style={statLabel}>Orbital speed</div>
-          <div style={{ ...statValue, color: '#8b9dff' }}>{fmt(vOrbit)} km/s</div>
+          <div style={{ ...statValue, color: '#60a5fa' }}>{fmt(vOrbit)} km/s</div>
         </motion.div>
         <motion.div
           key={`escape-${fmt(vEscape)}`}
@@ -90,7 +90,7 @@ export default function OrbitalVelocity() {
           style={statBox}
         >
           <div style={statLabel}>Escape speed</div>
-          <div style={{ ...statValue, color: '#4fd1c5' }}>{fmt(vEscape)} km/s</div>
+          <div style={{ ...statValue, color: '#2dd4bf' }}>{fmt(vEscape)} km/s</div>
         </motion.div>
       </div>
     </InteractiveCard>
@@ -100,13 +100,13 @@ export default function OrbitalVelocity() {
 const statBox: React.CSSProperties = {
   padding: '0.9rem',
   borderRadius: '0.6rem',
-  background: '#0a0f24',
-  border: '1px solid #1b2147',
+  background: '#0f0f0f',
+  border: '1px solid #262626',
   textAlign: 'center',
 };
 const statLabel: React.CSSProperties = {
   fontSize: '0.8rem',
-  color: '#aab4d4',
+  color: '#a1a1a1',
   marginBottom: '0.3rem',
 };
 const statValue: React.CSSProperties = {
