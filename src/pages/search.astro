@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Search from 'astro-pagefind/components/Search.astro';
+---
+
+<BaseLayout title="Search" description="Full-text search across the knowledge base.">
+  <h1
+    class="text-4xl font-extrabold tracking-tight text-ink-900 sm:text-5xl"
+    style="font-family: var(--font-display)"
+  >
+    Search
+  </h1>
+  <p class="mt-4 text-lg text-ink-500">
+    Full-text search across every article, powered by a static Pagefind index.
+  </p>
+  <div class="mt-8">
+    <Search className="pagefind-ui" configOptions={{ showImages: false }} />
+  </div>
+</BaseLayout>

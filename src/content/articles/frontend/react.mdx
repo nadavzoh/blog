@@ -1,0 +1,26 @@
+---
+title: React
+description: Components, hooks and the islands model for shipping less JavaScript.
+updated: 2026-03-05
+tags: [frontend, react, javascript]
+---
+
+**React** describes UI as a function of state. You compose **components** that
+return markup, and React reconciles changes efficiently when state updates.
+
+```tsx
+import { useState } from 'react';
+
+export function Counter() {
+  const [count, setCount] = useState(0);
+  return <button onClick={() => setCount((c) => c + 1)}>Count: {count}</button>;
+}
+```
+
+## Islands instead of whole-page hydration
+
+Shipping an entire app as client JavaScript is wasteful when most of a page is
+static. The **islands** architecture renders everything to HTML at build time and
+hydrates only the interactive components — like the chart on the caching page —
+when they scroll into view. This keeps pages fast while still allowing rich,
+interactive content where it matters.

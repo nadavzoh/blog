@@ -2,19 +2,24 @@
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import react from '@astrojs/react';
+import sitemap from '@astrojs/sitemap';
+import pagefind from 'astro-pagefind';
 import tailwindcss from '@tailwindcss/vite';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 
-// Project is served from https://nadavzoh.github.io/blog/, so it lives under
-// the "/blog" path. Keeping this in one place lets us reuse it below.
-const BASE = '/blog';
+import { SITE } from './src/site.config.ts';
+
+// Single source of truth for the deployment base path. The site is served from
+// a sub-path (e.g. GitHub Pages under "/blog/"), so keep this in one place and
+// reuse it for the rehype link-rewriting plugin below.
+const BASE = SITE.base.replace(/\/$/, '');
 
 /**
  * Rehype plugin: rewrite root-absolute links and asset URLs inside MDX/Markdown
- * (e.g. `/posts/...` or `/favicon.svg`) so they are prefixed with the site base.
- * Posts can keep writing clean root-relative links and still work when the site
- * is hosted under a sub-path on GitHub Pages.
+ * (e.g. `/python/asyncio` or `/favicon.svg`) so they are prefixed with the site
+ * base. Authors can keep writing clean root-relative links and still have them
+ * work when the site is hosted under a sub-path.
  */
 function rehypeBaseLinks() {
   const attrs = ['href', 'src'];
@@ -36,14 +41,16 @@ function rehypeBaseLinks() {
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://nadavzoh.github.io',
-  base: `${BASE}/`,
+  site: SITE.site,
+  base: SITE.base,
   // GitHub Pages is configured to "Deploy from a branch" and serve the site
   // from the /docs folder, so build the static output straight into ./docs.
   outDir: './docs',
   integrations: [
     mdx(),
     react(),
+    sitemap(),
+    pagefind(),
   ],
   markdown: {
     remarkPlugins: [remarkMath],
@@ -51,12 +58,6 @@ export default defineConfig({
   },
   vite: {
     plugins: [tailwindcss()],
-    // satellite.js v7 ships a WebAssembly worker that uses top-level await;
-    // emitting workers as ES modules (rather than the default IIFE) lets it
-    // bundle for the browser.
-    worker: {
-      format: 'es',
-    },
     build: {
       target: 'esnext',
     },

@@ -1,0 +1,35 @@
+---
+title: Type Hints
+description: Gradual typing in Python with annotations, generics and static checkers.
+updated: 2026-02-02
+tags: [python, typing]
+---
+
+Python's **type hints** are optional annotations that describe the expected types
+of variables, parameters and return values. They are ignored at runtime but power
+static checkers like `mypy` and editor tooling.
+
+```python
+from collections.abc import Iterable
+
+def total(values: Iterable[float]) -> float:
+    return sum(values)
+```
+
+## Gradual typing
+
+Type hints are *gradual*: you can annotate as much or as little as you like, and
+unannotated code is treated as dynamically typed. This lets large codebases adopt
+typing incrementally without a big-bang rewrite.
+
+## Generics
+
+Parameterised types describe containers without losing element information:
+
+```python
+def first[T](items: list[T]) -> T:
+    return items[0]
+```
+
+A static checker now knows `first([1, 2, 3])` returns an `int`, catching whole
+classes of bugs before the code ever runs.

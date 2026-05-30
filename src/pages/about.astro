@@ -1,31 +1,35 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../site.config';
 ---
 
-<BaseLayout title="About — Orbital Notes">
+<BaseLayout title="About">
   <article class="prose">
-    <h1>About Orbital Notes</h1>
+    <h1>About {SITE.name}</h1>
     <p>
-      <strong>Orbital Notes</strong> is a small personal blog about space and orbital
-      mechanics, written for the curious — not the credentialed. Every post assumes
-      <em>zero</em> prior knowledge of physics or the space domain and builds gently on the
-      one before it.
+      <strong>{SITE.name}</strong> is a self-hosted, topic-first knowledge platform — a
+      permanent, searchable, linkable home for technical notes, articles, references and
+      experiments accumulated across many sources and tools.
     </p>
     <p>
-      What makes these posts different is that the explanations are <em>interactive</em>.
-      Instead of staring at a static diagram, you can drag a slider and watch a satellite
-      crash, orbit, or escape in real time. The interactive bits are React components
-      embedded directly inside the writing, hydrated only when you scroll to them.
+      Content is organised by <em>topic</em> rather than by date. Each topic is a landing
+      page that gathers related articles, and every article belongs to a single topic. The
+      result is closer to a personal technical wiki than to a chronological blog.
     </p>
     <h2>How it's built</h2>
     <ul>
-      <li><strong>Astro 5</strong> with content collections for the posts.</li>
-      <li><strong>MDX</strong> so posts can embed live components.</li>
-      <li><strong>React 19 islands</strong>, hydrated with <code>client:visible</code>.</li>
+      <li><strong>Astro 5</strong> with content collections for topics and articles.</li>
+      <li><strong>MDX</strong> so articles can embed live, interactive components.</li>
+      <li><strong>React 19 islands</strong>, hydrated only when scrolled into view.</li>
       <li><strong>Tailwind v4</strong> via the Vite plugin for styling.</li>
-      <li><strong>Motion</strong> for entrance animations.</li>
-      <li><strong>KaTeX</strong> (remark-math + rehype-katex) for the equations.</li>
-      <li><strong>Recharts</strong> for the charts.</li>
+      <li><strong>KaTeX</strong> (remark-math + rehype-katex) for mathematics.</li>
+      <li><strong>Recharts</strong> for charts and data visualizations.</li>
+      <li><strong>Pagefind</strong> for static, scalable full-text search.</li>
+      <li><strong>RSS &amp; sitemap</strong> for syndication and SEO.</li>
     </ul>
+    <p>
+      Everything is static and filesystem-driven: no database, no CMS, no server — just
+      content you own, built into plain HTML.
+    </p>
   </article>
 </BaseLayout>
