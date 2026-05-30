@@ -1,6 +1,6 @@
 ---
 import BaseLayout from './BaseLayout.astro';
-import { coverFor, formatDate, articleDate, type Article, type Topic } from '../lib/content';
+import { coverFor, formatDate, articleDate, tagSlug, type Article, type Topic } from '../lib/content';
 
 interface Props {
   article: Article;
@@ -45,7 +45,12 @@ const cover = coverFor(article, base);
         tags.length > 0 && (
           <div class="mt-4 flex flex-wrap gap-1.5" data-pagefind-ignore>
             {tags.map((tag) => (
-              <span class="rounded-full bg-bg-soft px-2.5 py-0.5 text-xs text-ink-500">#{tag}</span>
+              <a
+                href={`${base}tags/${tagSlug(tag)}`}
+                class="rounded-full bg-bg-soft px-2.5 py-0.5 text-xs text-ink-500 transition hover:bg-bg-soft hover:text-brand-600"
+              >
+                #{tag}
+              </a>
             ))}
           </div>
         )
