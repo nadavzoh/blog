@@ -1,0 +1,58 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SatelliteGlobe from '../components/SatelliteGlobe.tsx';
+---
+
+<BaseLayout
+  title="Live Satellite Viewer — Orbital Notes"
+  description="A real-time 3D view of satellites orbiting Earth, propagated in your browser from live CelesTrak data."
+>
+  <section class="mb-8">
+    <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
+      Live satellite viewer
+    </h1>
+    <p class="mt-4 max-w-2xl text-lg text-ink-400">
+      Everything you read about in the series, made literal. This globe pulls
+      live orbital elements from <a
+        class="text-accent-400 hover:text-accent-500"
+        href="https://celestrak.org/"
+        target="_blank"
+        rel="noopener">CelesTrak</a
+      > and propagates each satellite in your browser with the
+      <strong class="text-ink-50">SGP4</strong> model — the same math used by mission
+      controllers — to place thousands of objects in real time.
+    </p>
+  </section>
+
+  <SatelliteGlobe client:only="react" />
+
+  <section class="prose mt-4">
+    <h2>How this works</h2>
+    <ul>
+      <li>
+        <strong>Data:</strong> two-line element sets (TLEs) fetched live from CelesTrak.
+        If the request is blocked or offline, a small bundled snapshot is used so
+        something always renders.
+      </li>
+      <li>
+        <strong>Propagation:</strong>
+        <code>satellite.js</code> runs SGP4 entirely client-side to turn each TLE into
+        an Earth-centred inertial position for the current (simulated) time.
+      </li>
+      <li>
+        <strong>Rendering:</strong> Three.js draws the Earth (NASA Blue Marble) inside
+        a NASA deep-star-map sky, with the globe spinning at sidereal rate beneath
+        the orbits.
+      </li>
+      <li>
+        <strong>Hosting:</strong> it is all static and runs on GitHub Pages — no server,
+        no build-time data.
+      </li>
+    </ul>
+    <p>
+      Geographic registration is approximate; this is a visualization, not a
+      tracking tool. For precise pass predictions you would also model
+      observer location, light-time, and atmospheric refraction.
+    </p>
+  </section>
+</BaseLayout>

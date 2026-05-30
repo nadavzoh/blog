@@ -51,5 +51,14 @@ export default defineConfig({
   },
   vite: {
     plugins: [tailwindcss()],
+    // satellite.js v7 ships a WebAssembly worker that uses top-level await;
+    // emitting workers as ES modules (rather than the default IIFE) lets it
+    // bundle for the browser.
+    worker: {
+      format: 'es',
+    },
+    build: {
+      target: 'esnext',
+    },
   },
 });
