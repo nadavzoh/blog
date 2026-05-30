@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import type { ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 
 interface InteractiveCardProps {
   title: string;
@@ -9,14 +9,23 @@ interface InteractiveCardProps {
 
 /**
  * A consistent, animated frame used to wrap every interactive island.
- * Fades/slides in when scrolled into view so embeds feel alive.
+ *
+ * The islands hydrate with `client:visible`, so they are already on screen by
+ * the time React takes over. We gate the entrance animation behind a `mounted`
+ * flag so the server-rendered markup and the first client render are identical
+ * (no hydration mismatch), then play the fade/slide-in on mount.
  */
 export default function InteractiveCard({ title, subtitle, children }: InteractiveCardProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <motion.figure
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-80px' }}
+      initial={false}
+      animate={{ opacity: mounted ? 1 : 0, y: mounted ? 0 : 24 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
       style={{
         margin: '2rem 0',
