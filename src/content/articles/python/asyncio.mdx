@@ -1,0 +1,48 @@
+---
+title: Asyncio
+description: How Python's event loop turns blocking I/O into cooperative concurrency.
+updated: 2026-01-15
+tags: [python, asyncio, concurrency]
+---
+
+`asyncio` provides single-threaded concurrency through an **event loop** that
+multiplexes many I/O-bound tasks. Instead of blocking a thread while waiting on
+the network, a coroutine `await`s and yields control back to the loop, which runs
+other ready tasks in the meantime.
+
+## Coroutines and the event loop
+
+A coroutine is defined with `async def` and only makes progress when driven by
+the loop:
+
+```python
+import asyncio
+
+async def fetch(name: str, delay: float) -> str:
+    await asyncio.sleep(delay)  # yields to the loop instead of blocking
+    return f"{name} done"
+
+async def main() -> None:
+    results = await asyncio.gather(
+        fetch("a", 1.0),
+        fetch("b", 0.5),
+    )
+    print(results)
+
+asyncio.run(main())
+```
+
+## Why it scales
+
+With blocking I/O, serving *N* concurrent connections costs roughly *N* threads.
+With an event loop the cost is dominated by memory per task, not per thread, so a
+single process can keep many thousands of sockets in flight. If each task spends
+a fraction $p$ of its time actually using the CPU, the loop can in principle
+interleave about
+
+$$
+N \approx \frac{1}{p}
+$$
+
+tasks before the CPU saturates — which is why `asyncio` shines for I/O-bound
+workloads and does little for CPU-bound ones.

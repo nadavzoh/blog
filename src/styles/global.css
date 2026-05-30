@@ -2,10 +2,10 @@
 @import 'katex/dist/katex.min.css';
 
 /*
- * Orbital Notes — light, card-based design system.
+ * Knowledge Base — light, card-based design system.
  *
- * Inspired by a clean editorial blog: soft lavender-tinted background, crisp
- * white cards, a single confident blue brand colour, and generous rounding.
+ * A clean editorial look: soft lavender-tinted background, crisp white cards,
+ * a single confident blue brand colour, and generous rounding.
  * Tokens are exposed as Tailwind v4 theme variables so utilities like
  * `bg-brand-500`, `text-ink-700`, `border-line` are available everywhere.
  */

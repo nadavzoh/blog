@@ -1,0 +1,61 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import { coverFor, formatDate, articleDate, type Article, type Topic } from '../lib/content';
+
+interface Props {
+  article: Article;
+  topic: Topic;
+}
+
+const base = import.meta.env.BASE_URL;
+const { article, topic } = Astro.props;
+const { title, description, tags } = article.data;
+const date = articleDate(article);
+const cover = coverFor(article, base);
+---
+
+<BaseLayout title={title} description={description}>
+  <nav class="flex items-center gap-1.5 text-sm font-medium text-ink-500" aria-label="Breadcrumb">
+    <a href={base} class="transition hover:text-brand-600">Home</a>
+    <span aria-hidden="true">/</span>
+    <a href={`${base}${topic.id}`} class="transition hover:text-brand-600">{topic.data.title}</a>
+  </nav>
+
+  <article class="mt-6" data-pagefind-body>
+    <header class="mb-8">
+      <div class="flex flex-wrap items-center gap-3 text-sm text-ink-500">
+        <a href={`${base}${topic.id}`} class="badge">{topic.data.title}</a>
+        {
+          date && (
+            <>
+              <span aria-hidden="true">•</span>
+              <time datetime={date.toISOString()}>Updated {formatDate(date)}</time>
+            </>
+          )
+        }
+      </div>
+      <h1
+        class="mt-4 text-3xl font-extrabold leading-tight tracking-tight text-ink-900 sm:text-4xl"
+        style="font-family: var(--font-display)"
+      >
+        {title}
+      </h1>
+      <p class="mt-3 text-lg text-ink-500">{description}</p>
+      {
+        tags.length > 0 && (
+          <div class="mt-4 flex flex-wrap gap-1.5" data-pagefind-ignore>
+            {tags.map((tag) => (
+              <span class="rounded-full bg-bg-soft px-2.5 py-0.5 text-xs text-ink-500">#{tag}</span>
+            ))}
+          </div>
+        )
+      }
+    </header>
+
+    <img src={cover} alt="" class="card mb-10 aspect-[21/9] w-full object-cover" data-pagefind-ignore />
+
+    <div class="prose">
+      <slot />
+    </div>
+  </article>
+</BaseLayout>

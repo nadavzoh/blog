@@ -1,0 +1,48 @@
+---
+title: Caching
+description: Cache strategies, invalidation and the math behind hit ratios.
+updated: 2026-02-20
+tags: [system-design, caching, performance]
+---
+
+import ExampleChart from '../../../components/ExampleChart.tsx';
+
+A **cache** stores the results of expensive work close to where it is needed so
+repeated requests are served cheaply. The hard parts are placement, eviction and
+invalidation.
+
+## Effective latency
+
+If a cache serves a fraction $h$ of requests (the **hit ratio**) at latency
+$t_\text{hit}$ and the rest fall through to the origin at $t_\text{miss}$, the
+average latency is:
+
+$$
+t_\text{avg} = h \cdot t_\text{hit} + (1 - h) \cdot t_\text{miss}
+$$
+
+Because $t_\text{miss} \gg t_\text{hit}$, even modest hit ratios pay off quickly —
+and the returns are steep as $h$ approaches 1:
+
+<ExampleChart
+  client:visible
+  title="Latency vs. hit ratio"
+  subtitle="Average latency falls sharply as the cache hit ratio rises."
+  data={[
+    { x: '0%', y: 100 },
+    { x: '50%', y: 51 },
+    { x: '80%', y: 21 },
+    { x: '90%', y: 11 },
+    { x: '95%', y: 6 },
+    { x: '99%', y: 2 },
+  ]}
+/>
+
+## Invalidation
+
+> There are only two hard things in computer science: cache invalidation and
+> naming things.
+
+Common strategies include **time-to-live (TTL)** expiry, **write-through** caches
+that update on every write, and **cache-aside**, where the application loads and
+populates the cache on a miss.

@@ -1,0 +1,40 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getArticles, tagsOf, tagSlug } from '../../lib/content';
+
+const base = import.meta.env.BASE_URL;
+const articles = await getArticles();
+const tags = tagsOf(articles);
+
+const count = (tag: string) => articles.filter((a) => a.data.tags.includes(tag)).length;
+---
+
+<BaseLayout title="Tags" description="Browse articles by tag.">
+  <h1
+    class="text-4xl font-extrabold tracking-tight text-ink-900 sm:text-5xl"
+    style="font-family: var(--font-display)"
+  >
+    Tags
+  </h1>
+  <p class="mt-4 text-lg text-ink-500">Cross-topic index of every tag used across the knowledge base.</p>
+
+  {
+    tags.length === 0 ? (
+      <p class="mt-8 text-ink-500">No tags yet.</p>
+    ) : (
+      <ul class="mt-8 flex flex-wrap gap-2.5">
+        {tags.map((tag) => (
+          <li>
+            <a
+              href={`${base}tags/${tagSlug(tag)}`}
+              class="inline-flex items-center gap-2 rounded-full border border-line bg-card px-3.5 py-1.5 text-sm font-medium text-ink-700 transition hover:border-brand-400 hover:text-brand-600"
+            >
+              #{tag}
+              <span class="text-xs text-ink-400">{count(tag)}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</BaseLayout>
