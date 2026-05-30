@@ -61,9 +61,16 @@ const REGIMES: Regime[] = [
   },
 ];
 
-/** Logarithmic map from altitude (km) to a drawing radius in SVG units. */
-function radiusForAltitude(altKm: number, surfaceR: number, kmPerUnit: number): number {
-  return surfaceR + Math.log1p(altKm / 200) * kmPerUnit;
+/**
+ * Map an altitude (km) to a drawing radius in SVG units, mirroring the viewer's
+ * Shell view: the surface maps to `surfaceR`, and altitude is log-stretched in
+ * Earth-radius units with the exact same curve the globe uses
+ * (`1 + 0.9·ln(1 + 6·altEr)`), so the diagram and the live viewer agree.
+ */
+function radiusForAltitude(altKm: number, surfaceR: number): number {
+  const altEr = altKm / EARTH_RADIUS_KM;
+  const sceneR = 1 + Math.log1p(altEr * 6) * 0.9;
+  return surfaceR * sceneR;
 }
 
 export default function OrbitalRegimes() {
@@ -74,9 +81,8 @@ export default function OrbitalRegimes() {
   const cx = 180;
   const cy = 180;
   const surfaceR = 34; // px radius drawn for the globe itself
-  const kmPerUnit = 26; // spreads the log scale across the canvas
 
-  const geoR = radiusForAltitude(35786, surfaceR, kmPerUnit);
+  const geoR = radiusForAltitude(35786, surfaceR);
 
   return (
     <InteractiveCard
@@ -120,9 +126,9 @@ export default function OrbitalRegimes() {
         >
           {/* Shell bands, drawn from the outside in so inner ones sit on top. */}
           {[...REGIMES].reverse().map((r) => {
-            const inner = radiusForAltitude(r.loKm, surfaceR, kmPerUnit);
+            const inner = radiusForAltitude(r.loKm, surfaceR);
             const outer =
-              r.hiKm === r.loKm ? inner + 3 : radiusForAltitude(r.hiKm, surfaceR, kmPerUnit);
+              r.hiKm === r.loKm ? inner + 3 : radiusForAltitude(r.hiKm, surfaceR);
             const isActive = r.id === activeId;
             return (
               <circle
@@ -189,7 +195,7 @@ export default function OrbitalRegimes() {
         </div>
       </div>
 
-      <p style={{ marginTop: '0.9rem', fontSize: '0.78rem', color: '#71717a' }}>
+      <p style={{ marginTop: '0.9rem', fontSize: '0.78rem', color: '#a1a1a1' }}>
         {`Earth\u2019s radius is ${EARTH_RADIUS_KM.toLocaleString()} km; shell radii are log-scaled so LEO stays readable next to the distant GEO ring.`}
       </p>
     </InteractiveCard>

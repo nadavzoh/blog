@@ -33,6 +33,7 @@ html {
 body {
   background: var(--color-surface-950);
   color: var(--color-ink-50);
+  font-family: var(--font-sans);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;

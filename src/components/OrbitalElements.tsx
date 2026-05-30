@@ -120,7 +120,7 @@ export default function OrbitalElements() {
           minHeight: '1.4rem',
           marginTop: '0.45rem',
           fontSize: '0.82rem',
-          color: hovered ? hovered.color : '#71717a',
+          color: hovered ? hovered.color : '#a1a1a1',
         }}
       >
         {hovered ? (
