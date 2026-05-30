@@ -25,6 +25,20 @@ delta-v as the true "distance" between orbits. Every drop of propellant a rocket
 carries buys a fixed budget of delta-v, so smart mission design means spending it
 wisely.
 
+How much delta-v a given tank of fuel actually buys is set by **Tsiolkovsky's
+rocket equation**:
+
+$$
+\Delta v = v_{\text{e}} \ln\!\left(\frac{m_0}{m_f}\right)
+$$
+
+Here $v_{\text{e}}$ is the exhaust speed of the engine, $m_0$ the fully fuelled
+mass, and $m_f$ the mass once the tanks are dry. The logarithm is the cruel part:
+because delta-v grows only with the *log* of the mass ratio, each extra bit of
+delta-v costs exponentially more propellant. That is exactly why mission
+designers fight so hard to shave delta-v — and why the fuel-sipping maneuvers
+below matter so much.
+
 ## The two-burn dance
 
 A Hohmann transfer connects a small circular orbit to a larger one using **half
@@ -56,6 +70,20 @@ higher orbits move *slower* overall (from
 your first burn trades speed for *altitude*. As you coast outward, gravity bleeds
 away that extra speed, so by the time you arrive you're actually moving slower
 than before — which is why you need that second burn to top back up.
+
+To put real numbers on those burns we need the speed at *any* point of an orbit,
+not just a circular one. That comes from the **vis-viva equation**, which follows
+straight from conservation of energy:
+
+$$
+v^2 = G M\left(\frac{2}{r} - \frac{1}{a}\right)
+$$
+
+where $r$ is the current distance from the planet's centre and $a$ is the
+semi-major axis of the orbit you're on. For a circle $r = a$ and it collapses
+back to $v = \sqrt{GM/r}$; for the transfer ellipse, $a$ is the average of the
+inner and outer radii. Each Hohmann burn is just the *difference* between the
+circular speed and the transfer-ellipse speed at that radius.
 
 The total cost is the sum of the two burns:
 

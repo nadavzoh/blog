@@ -213,25 +213,28 @@ const ORBIT_SAMPLES = 180;
 /**
  * How altitude maps to scene distance.
  *  - `true`: real proportions — LEO hugs the globe, GEO sits far out.
- *  - `compressed`: a visualization aid that exaggerates low altitudes so the
- *    crowded LEO shells spread into visible bands (the "Shell view" mode).
+ *  - `shell`: a visualization aid that stretches low altitudes so the crowded
+ *    LEO shells spread into visible bands (the "Shell view" mode). Doing so
+ *    compresses the overall range, pulling the distant MEO/GEO shells inward.
  */
-type ViewMode = 'true' | 'compressed';
+type ViewMode = 'true' | 'shell';
 
 /**
  * Map an altitude above Earth's surface (in Earth radii) to a scene radius
  * measured from the globe centre. The surface always maps to radius 1, so the
  * globe itself is unchanged; only the spacing of orbits above it differs.
  *
- * In `compressed` mode we apply a logarithmic remap that stretches the first
- * few thousand kilometres (where LEO lives) while still keeping MEO/GEO ordered
- * and on-screen. This is a visual aid, not a physically accurate scale.
+ * In `shell` mode we apply a logarithmic remap that stretches the first few
+ * thousand kilometres (where LEO lives) while still keeping MEO/GEO ordered and
+ * on-screen. The log curve magnifies altitudes below ~4,700 km and gently
+ * compresses everything above, which is what fans the LEO shells apart. It is a
+ * visual aid, not a physically accurate scale.
  */
 function radiusForAltitude(altitudeEr: number, mode: ViewMode): number {
   const alt = Math.max(0, altitudeEr);
   if (mode === 'true') return 1 + alt;
   // log1p grows fast near 0 then flattens; the multiplier sets how far the
-  // GEO belt (~5.6 Er altitude) ends up from the surface in compressed view.
+  // GEO belt (~5.6 Er altitude) ends up from the surface in shell view.
   return 1 + Math.log1p(alt * 6) * 0.9;
 }
 
@@ -308,7 +311,7 @@ export default function SatelliteGlobe() {
     [],
   );
 
-  // View mode (true scale vs. compressed "Shell view"), the control menu's
+  // View mode (true scale vs. log-scaled "Shell view"), the control menu's
   // open state, and per-layer visibility toggles.
   const [viewMode, setViewMode] = useState<ViewMode>('true');
   const [menuOpen, setMenuOpen] = useState(false);
@@ -542,7 +545,7 @@ export default function SatelliteGlobe() {
     /**
      * ECI position (km) -> scene coords (Earth radii). Z (north) -> scene Y.
      * The radial magnitude is remapped through `radiusForAltitude` so the same
-     * direction can be drawn at true or compressed altitude depending on mode.
+     * direction can be drawn at true or shell-view altitude depending on mode.
      */
     const eciToScene = (out: Float32Array, offset: number, p: { x: number; y: number; z: number }) => {
       // Scene axes: X stays, ECI Z (north) -> scene Y, ECI Y -> scene -Z.
@@ -976,7 +979,7 @@ export default function SatelliteGlobe() {
                   {(
                     [
                       ['true', 'True scale'],
-                      ['compressed', 'Shell view'],
+                      ['shell', 'Shell view'],
                     ] as [ViewMode, string][]
                   ).map(([mode, label]) => (
                     <button
