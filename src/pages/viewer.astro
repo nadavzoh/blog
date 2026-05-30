@@ -45,6 +45,20 @@ import SatelliteGlobe from '../components/SatelliteGlobe.tsx';
         the orbits.
       </li>
       <li>
+        <strong>View modes:</strong> <em>LEO normal</em> places every satellite at
+        its true altitude, so the dense low-Earth-orbit shells crowd against the
+        globe while distant GEO objects sit far out. <em>LEO structure</em> applies
+        a compressed radial scale — a visualization aid, not a physical one — that
+        stretches those low altitudes so the orbital shells fan out into visible
+        bands. Both come from the same data; only the altitude-to-distance mapping
+        changes.
+      </li>
+      <li>
+        <strong>Controls:</strong> the ☰ menu over the canvas switches view mode,
+        toggles layers (satellites, orbit trace, starfield, Earth) on or off, and
+        resets the camera.
+      </li>
+      <li>
         <strong>Hosting:</strong> it is all static and runs on GitHub Pages — no server,
         no build-time data.
       </li>

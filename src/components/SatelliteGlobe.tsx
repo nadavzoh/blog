@@ -38,6 +38,31 @@ const PICK_PX = 14;
 /** Number of samples used to trace one full orbit. */
 const ORBIT_SAMPLES = 180;
 
+/**
+ * How altitude maps to scene distance.
+ *  - `true`: real proportions — LEO hugs the globe, GEO sits far out.
+ *  - `compressed`: a visualization aid that exaggerates low altitudes so the
+ *    crowded LEO shells spread into visible bands ("LEO structure").
+ */
+type ViewMode = 'true' | 'compressed';
+
+/**
+ * Map an altitude above Earth's surface (in Earth radii) to a scene radius
+ * measured from the globe centre. The surface always maps to radius 1, so the
+ * globe itself is unchanged; only the spacing of orbits above it differs.
+ *
+ * In `compressed` mode we apply a logarithmic remap that stretches the first
+ * few thousand kilometres (where LEO lives) while still keeping MEO/GEO ordered
+ * and on-screen. This is a visual aid, not a physically accurate scale.
+ */
+function radiusForAltitude(altitudeEr: number, mode: ViewMode): number {
+  const alt = Math.max(0, altitudeEr);
+  if (mode === 'true') return 1 + alt;
+  // log1p grows fast near 0 then flattens; the multiplier sets how far the
+  // GEO belt (~5.6 Er altitude) ends up from the surface in compressed view.
+  return 1 + Math.log1p(alt * 6) * 0.9;
+}
+
 interface ParsedSat {
   name: string;
   satrec: SatRec;
@@ -103,11 +128,24 @@ export default function SatelliteGlobe() {
   const [count, setCount] = useState(0);
   const [selected, setSelected] = useState<ParsedSat | null>(null);
 
+  // View mode (true scale vs. compressed "LEO structure"), the control menu's
+  // open state, and per-layer visibility toggles.
+  const [viewMode, setViewMode] = useState<ViewMode>('true');
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [showSats, setShowSats] = useState(true);
+  const [showOrbit, setShowOrbit] = useState(true);
+  const [showStars, setShowStars] = useState(true);
+  const [showEarth, setShowEarth] = useState(true);
+
   // Keep the live list of satellites and the time multiplier in refs so the
   // animation loop (set up once) always sees the latest values.
   const satsRef = useRef<ParsedSat[]>([]);
   const speedRef = useRef(speed);
   speedRef.current = speed;
+
+  // The current view mode mirrored into a ref for the render loop.
+  const viewModeRef = useRef<ViewMode>(viewMode);
+  viewModeRef.current = viewMode;
 
   // The satellite drawn at each rendered point index (rebuilt every tick), so a
   // click on a point can be mapped back to its underlying record.
@@ -117,6 +155,12 @@ export default function SatelliteGlobe() {
   selectedRef.current = selected;
   // Set inside the scene effect; (re)builds the orbit trace + marker on demand.
   const rebuildOrbitRef = useRef<(sat: ParsedSat | null) => void>(() => {});
+  // Set inside the scene effect; restores the camera to its starting pose.
+  const resetViewRef = useRef<() => void>(() => {});
+  // Set inside the scene effect; toggles a named layer's visibility.
+  const setLayerRef = useRef<(layer: 'sats' | 'orbit' | 'stars' | 'earth', visible: boolean) => void>(
+    () => {},
+  );
 
   const details = useMemo(() => (selected ? computeDetails(selected) : null), [selected]);
 
@@ -163,11 +207,12 @@ export default function SatelliteGlobe() {
     if (!mount) return;
 
     const width = mount.clientWidth;
-    const height = Math.max(360, Math.round(width * 0.62));
+    const height = Math.max(440, Math.round(width * 0.72));
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, width / height, 0.01, 1000);
-    camera.position.set(0, 1.6, 4.2);
+    const CAMERA_HOME = new THREE.Vector3(0, 1.6, 4.2);
+    camera.position.copy(CAMERA_HOME);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
     renderer.setSize(width, height);
@@ -212,6 +257,9 @@ export default function SatelliteGlobe() {
     // Starfield background — NASA deep star map on a big inward-facing sphere,
     // with a procedural point-cloud fallback if the texture is unavailable.
     let starField: THREE.Object3D | null = null;
+    // Desired starfield visibility, tracked here so a toggle made before the
+    // texture finishes loading is still honoured once it appears.
+    let starsVisible = true;
     loader.load(
       STARS_TEXTURE_URL,
       (tex) => {
@@ -219,6 +267,7 @@ export default function SatelliteGlobe() {
         const skyGeo = new THREE.SphereGeometry(400, 48, 48);
         const skyMat = new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide });
         starField = new THREE.Mesh(skyGeo, skyMat);
+        starField.visible = starsVisible;
         scene.add(starField);
       },
       undefined,
@@ -235,6 +284,7 @@ export default function SatelliteGlobe() {
           starGeo,
           new THREE.PointsMaterial({ color: 0xffffff, size: 0.7, sizeAttenuation: false }),
         );
+        starField.visible = starsVisible;
         scene.add(starField);
       },
     );
@@ -277,11 +327,28 @@ export default function SatelliteGlobe() {
     orbitLine.visible = false;
     scene.add(orbitLine);
 
-    /** ECI position (km) -> scene coords (Earth radii). Z (north) -> scene Y. */
+    /**
+     * ECI position (km) -> scene coords (Earth radii). Z (north) -> scene Y.
+     * The radial magnitude is remapped through `radiusForAltitude` so the same
+     * direction can be drawn at true or compressed altitude depending on mode.
+     */
     const eciToScene = (out: Float32Array, offset: number, p: { x: number; y: number; z: number }) => {
-      out[offset] = p.x / EARTH_RADIUS_KM;
-      out[offset + 1] = p.z / EARTH_RADIUS_KM;
-      out[offset + 2] = -p.y / EARTH_RADIUS_KM;
+      // Scene axes: X stays, ECI Z (north) -> scene Y, ECI Y -> scene -Z.
+      const x = p.x / EARTH_RADIUS_KM;
+      const y = p.z / EARTH_RADIUS_KM;
+      const z = -p.y / EARTH_RADIUS_KM;
+      const r = Math.hypot(x, y, z);
+      if (r < 1e-6) {
+        out[offset] = x;
+        out[offset + 1] = y;
+        out[offset + 2] = z;
+        return;
+      }
+      // r is the true geocentric distance in Earth radii; altitude is r - 1.
+      const scaled = radiusForAltitude(r - 1, viewModeRef.current) / r;
+      out[offset] = x * scaled;
+      out[offset + 1] = y * scaled;
+      out[offset + 2] = z * scaled;
     };
 
     // Simulated clock — advances faster than real time by `speedRef.current`.
@@ -328,6 +395,8 @@ export default function SatelliteGlobe() {
     };
 
     // Trace one full orbit of `sat` starting at the current simulated time.
+    // Whether the trace is shown also depends on the "Orbit trace" layer toggle.
+    let orbitLayerVisible = true;
     rebuildOrbitRef.current = (sat: ParsedSat | null) => {
       if (!sat) {
         orbitLine.visible = false;
@@ -351,7 +420,36 @@ export default function SatelliteGlobe() {
       (orbitGeo.getAttribute('position') as THREE.BufferAttribute).needsUpdate = true;
       orbitGeo.setDrawRange(0, ORBIT_SAMPLES + 1);
       orbitGeo.computeBoundingSphere();
-      orbitLine.visible = true;
+      orbitLine.visible = orbitLayerVisible;
+    };
+
+    // Restore the camera to its starting pose (used by the "Reset view" button).
+    resetViewRef.current = () => {
+      controls.target.set(0, 0, 0);
+      camera.position.copy(CAMERA_HOME);
+      camera.updateProjectionMatrix();
+      controls.update();
+    };
+
+    // Toggle a named layer's visibility from the control menu.
+    setLayerRef.current = (layer, visible) => {
+      switch (layer) {
+        case 'sats':
+          satPoints.visible = visible;
+          break;
+        case 'orbit':
+          orbitLayerVisible = visible;
+          // Only actually show it when a satellite is selected.
+          orbitLine.visible = visible && !!selectedRef.current;
+          break;
+        case 'stars':
+          starsVisible = visible;
+          if (starField) starField.visible = visible;
+          break;
+        case 'earth':
+          earth.visible = visible;
+          break;
+      }
     };
 
     let raf = 0;
@@ -434,7 +532,7 @@ export default function SatelliteGlobe() {
 
     const handleResize = () => {
       const w = mount.clientWidth;
-      const h = Math.max(360, Math.round(w * 0.62));
+      const h = Math.max(440, Math.round(w * 0.72));
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
@@ -448,6 +546,8 @@ export default function SatelliteGlobe() {
       dom.removeEventListener('pointermove', onPointerMove);
       dom.removeEventListener('pointerup', onPointerUp);
       rebuildOrbitRef.current = () => {};
+      resetViewRef.current = () => {};
+      setLayerRef.current = () => {};
       controls.dispose();
       renderer.dispose();
       earthGeo.dispose();
@@ -466,6 +566,28 @@ export default function SatelliteGlobe() {
   useEffect(() => {
     rebuildOrbitRef.current(selected);
   }, [selected]);
+
+  // When the view mode flips, the satellite points re-map automatically on the
+  // next tick (eciToScene reads the live ref), but the static orbit trace needs
+  // an explicit rebuild so it lines up with the dots.
+  useEffect(() => {
+    rebuildOrbitRef.current(selected);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewMode]);
+
+  // Bridge each layer toggle into the scene.
+  useEffect(() => {
+    setLayerRef.current('sats', showSats);
+  }, [showSats]);
+  useEffect(() => {
+    setLayerRef.current('orbit', showOrbit);
+  }, [showOrbit]);
+  useEffect(() => {
+    setLayerRef.current('stars', showStars);
+  }, [showStars]);
+  useEffect(() => {
+    setLayerRef.current('earth', showEarth);
+  }, [showEarth]);
 
   const statusLabel =
     status === 'loading'
@@ -543,6 +665,134 @@ export default function SatelliteGlobe() {
 
       <div style={{ position: 'relative' }}>
         <div ref={mountRef} style={{ width: '100%', lineHeight: 0 }} />
+
+        {/* Control menu — view mode, layer toggles, and reset camera. */}
+        <div
+          style={{
+            position: 'absolute',
+            top: '0.75rem',
+            left: '0.75rem',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.5rem',
+            alignItems: 'flex-start',
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => setMenuOpen((o) => !o)}
+            aria-expanded={menuOpen}
+            aria-label="Toggle controls menu"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              background: 'rgba(17, 17, 17, 0.9)',
+              border: '1px solid #3f3f46',
+              borderRadius: '0.6rem',
+              color: '#ededed',
+              cursor: 'pointer',
+              fontSize: '0.8rem',
+              padding: '0.4rem 0.6rem',
+              backdropFilter: 'blur(4px)',
+            }}
+          >
+            <span aria-hidden="true">☰</span> Controls
+          </button>
+
+          {menuOpen && (
+            <div
+              style={{
+                width: 'min(220px, calc(100vw - 3rem))',
+                background: 'rgba(17, 17, 17, 0.92)',
+                border: '1px solid #3f3f46',
+                borderRadius: '0.6rem',
+                padding: '0.75rem 0.85rem',
+                fontSize: '0.8rem',
+                color: '#ededed',
+                backdropFilter: 'blur(4px)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.6rem',
+              }}
+            >
+              <div>
+                <div style={{ color: '#a1a1a1', marginBottom: '0.35rem' }}>View mode</div>
+                <div style={{ display: 'flex', gap: '0.35rem' }}>
+                  {(
+                    [
+                      ['true', 'LEO normal'],
+                      ['compressed', 'LEO structure'],
+                    ] as [ViewMode, string][]
+                  ).map(([mode, label]) => (
+                    <button
+                      key={mode}
+                      type="button"
+                      onClick={() => setViewMode(mode)}
+                      aria-pressed={viewMode === mode}
+                      style={{
+                        flex: 1,
+                        background: viewMode === mode ? '#2dd4bf' : '#1a1a1a',
+                        color: viewMode === mode ? '#04221d' : '#ededed',
+                        border: '1px solid #3f3f46',
+                        borderRadius: '0.4rem',
+                        cursor: 'pointer',
+                        fontSize: '0.75rem',
+                        fontWeight: viewMode === mode ? 600 : 400,
+                        padding: '0.3rem 0.4rem',
+                      }}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <div style={{ color: '#a1a1a1', marginBottom: '0.35rem' }}>Layers</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                  {(
+                    [
+                      ['Satellites', showSats, setShowSats],
+                      ['Orbit trace', showOrbit, setShowOrbit],
+                      ['Starfield', showStars, setShowStars],
+                      ['Earth', showEarth, setShowEarth],
+                    ] as [string, boolean, (v: boolean) => void][]
+                  ).map(([label, value, setter]) => (
+                    <label
+                      key={label}
+                      style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={value}
+                        onChange={(e) => setter(e.target.checked)}
+                        style={{ accentColor: '#2dd4bf' }}
+                      />
+                      <span>{label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => resetViewRef.current()}
+                style={{
+                  background: '#1a1a1a',
+                  color: '#ededed',
+                  border: '1px solid #3f3f46',
+                  borderRadius: '0.4rem',
+                  cursor: 'pointer',
+                  fontSize: '0.75rem',
+                  padding: '0.35rem 0.5rem',
+                }}
+              >
+                Reset view
+              </button>
+            </div>
+          )}
+        </div>
 
         {details && (
           <div
@@ -628,9 +878,15 @@ export default function SatelliteGlobe() {
       <figcaption style={{ padding: '0.75rem 1rem', fontSize: '0.8rem', color: '#a1a1a1' }}>
         Drag to rotate, scroll to zoom. Click a satellite to highlight it, trace
         its orbit, and read its orbital parameters; click empty space or ✕ to
-        clear. Positions are propagated in your browser with SGP4 (satellite.js)
-        from CelesTrak two-line elements. Teal dots are satellites; the globe
-        spins at sidereal rate beneath their inertial orbits.
+        clear. Use <strong style={{ color: '#ededed' }}>☰ Controls</strong> to
+        switch between <strong style={{ color: '#ededed' }}>LEO normal</strong>{' '}
+        (true altitudes — low orbits hug the globe) and{' '}
+        <strong style={{ color: '#ededed' }}>LEO structure</strong> (a compressed
+        scale that spreads the crowded low-orbit shells into visible bands),
+        toggle layers on or off, and reset the camera. Positions are propagated
+        in your browser with SGP4 (satellite.js) from CelesTrak two-line
+        elements. Teal dots are satellites; the globe spins at sidereal rate
+        beneath their inertial orbits.
       </figcaption>
     </figure>
   );
