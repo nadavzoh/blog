@@ -29,6 +29,96 @@ const GROUPS: { id: string; label: string }[] = [
 /** Hard cap so the main thread stays responsive even for huge groups. */
 const MAX_SATS = 4000;
 
+/**
+ * Satellite categories used to colour-code the point cloud. A satellite is
+ * classified purely from its CelesTrak name, so the same colours apply whether
+ * you load a single group or the whole active catalogue. Order matters: the
+ * first matching pattern wins, and "Other" is the catch-all fallback.
+ *
+ * `hex` drives the rendered point colour; `css` is the matching legend swatch.
+ */
+interface Category {
+  id: string;
+  label: string;
+  hex: number;
+  css: string;
+  /** Case-insensitive test against the satellite's name. */
+  match: (upperName: string) => boolean;
+}
+
+const CATEGORIES: Category[] = [
+  {
+    id: 'stations',
+    label: 'Space stations',
+    hex: 0xf87171,
+    css: '#f87171',
+    match: (n) => /ISS|ZARYA|CSS|TIANHE|TIANGONG|MIR|PROGRESS|SOYUZ|CREW DRAGON|CYGNUS/.test(n),
+  },
+  {
+    id: 'starlink',
+    label: 'Starlink',
+    hex: 0x38bdf8,
+    css: '#38bdf8',
+    match: (n) => n.includes('STARLINK'),
+  },
+  {
+    id: 'oneweb',
+    label: 'OneWeb',
+    hex: 0xc084fc,
+    css: '#c084fc',
+    match: (n) => n.includes('ONEWEB'),
+  },
+  {
+    id: 'navigation',
+    label: 'Navigation (GPS/GLONASS/…)',
+    hex: 0xa3e635,
+    css: '#a3e635',
+    match: (n) => /GPS|NAVSTAR|GLONASS|GALILEO|BEIDOU|QZS|NAVIC|IRNSS/.test(n),
+  },
+  {
+    id: 'iridium',
+    label: 'Iridium',
+    hex: 0xfb923c,
+    css: '#fb923c',
+    match: (n) => n.includes('IRIDIUM'),
+  },
+  {
+    id: 'other',
+    label: 'Other',
+    hex: 0x2dd4bf,
+    css: '#2dd4bf',
+    match: () => true,
+  },
+];
+
+const CATEGORY_BY_ID: Record<string, Category> = Object.fromEntries(
+  CATEGORIES.map((c) => [c.id, c]),
+);
+
+/** Classify a satellite by its name and return the owning category id. */
+function categorize(name: string): string {
+  const upper = name.toUpperCase();
+  for (const cat of CATEGORIES) {
+    if (cat.match(upper)) return cat.id;
+  }
+  return 'other';
+}
+
+/**
+ * Count how many satellites fall in each category and return legend entries in
+ * the canonical {@link CATEGORIES} order, omitting categories with no members.
+ */
+function buildLegend(sats: ParsedSat[]): { id: string; label: string; css: string; count: number }[] {
+  const counts = new Map<string, number>();
+  for (const s of sats) counts.set(s.category, (counts.get(s.category) ?? 0) + 1);
+  return CATEGORIES.filter((c) => (counts.get(c.id) ?? 0) > 0).map((c) => ({
+    id: c.id,
+    label: c.label,
+    css: c.css,
+    count: counts.get(c.id) ?? 0,
+  }));
+}
+
 /** WGS72 Earth radius used by SGP4 (satellite.js) for orbital element altitudes. */
 const SGP4_EARTH_RADIUS_KM = 6378.135;
 
@@ -66,11 +156,14 @@ function radiusForAltitude(altitudeEr: number, mode: ViewMode): number {
 interface ParsedSat {
   name: string;
   satrec: SatRec;
+  /** Category id from {@link categorize}, used for colour coding. */
+  category: string;
 }
 
 /** Human-readable orbital summary derived from a satellite's SGP4 record. */
 interface SatDetails {
   name: string;
+  category: string;
   noradId: string;
   inclinationDeg: number;
   periodMin: number;
@@ -83,6 +176,7 @@ function computeDetails(sat: ParsedSat): SatDetails {
   const s = sat.satrec;
   return {
     name: sat.name,
+    category: sat.category,
     noradId: String(s.satnum),
     inclinationDeg: (s.inclo * 180) / Math.PI,
     // Mean motion `no` is in radians/minute, so one revolution is 2π/no minutes.
@@ -110,7 +204,7 @@ function parseTle(text: string): ParsedSat[] {
     if (!l1 || !l2 || !l1.startsWith('1 ') || !l2.startsWith('2 ')) continue;
     try {
       const satrec = twoline2satrec(l1, l2);
-      if (satrec.error === SatRecError.None) sats.push({ name, satrec });
+      if (satrec.error === SatRecError.None) sats.push({ name, satrec, category: categorize(name) });
     } catch {
       /* skip malformed records */
     }
@@ -127,6 +221,10 @@ export default function SatelliteGlobe() {
   const [status, setStatus] = useState<Status>('loading');
   const [count, setCount] = useState(0);
   const [selected, setSelected] = useState<ParsedSat | null>(null);
+  // Per-category counts for the currently loaded set, driving the colour legend.
+  const [legend, setLegend] = useState<{ id: string; label: string; css: string; count: number }[]>(
+    [],
+  );
 
   // View mode (true scale vs. compressed "Shell view"), the control menu's
   // open state, and per-layer visibility toggles.
@@ -186,6 +284,7 @@ export default function SatelliteGlobe() {
         if (parsed.length === 0) throw new Error('no records');
         satsRef.current = parsed.slice(0, MAX_SATS);
         setCount(satsRef.current.length);
+        setLegend(buildLegend(satsRef.current));
         setStatus('live');
       })
       .catch(() => {
@@ -193,6 +292,7 @@ export default function SatelliteGlobe() {
         const parsed = parseTle(FALLBACK_TLE);
         satsRef.current = parsed;
         setCount(parsed.length);
+        setLegend(buildLegend(parsed));
         setStatus('fallback');
       });
 
@@ -289,18 +389,29 @@ export default function SatelliteGlobe() {
       },
     );
 
-    // Satellites — a single Points cloud whose buffer we rewrite each tick.
+    // Satellites — a single Points cloud whose position and colour buffers we
+    // rewrite each tick. Per-vertex colours encode each satellite's category.
     const satGeo = new THREE.BufferGeometry();
     const positions = new Float32Array(MAX_SATS * 3);
+    const satColors = new Float32Array(MAX_SATS * 3);
     satGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    satGeo.setAttribute('color', new THREE.BufferAttribute(satColors, 3));
     satGeo.setDrawRange(0, 0);
     const satMat = new THREE.PointsMaterial({
-      color: 0x2dd4bf,
+      vertexColors: true,
       size: 2.4,
       sizeAttenuation: false,
     });
     const satPoints = new THREE.Points(satGeo, satMat);
     scene.add(satPoints);
+
+    // Pre-resolve each category's colour into linear RGB triplets so the render
+    // loop only does buffer writes (no per-point colour-space conversion).
+    const categoryRgb: Record<string, [number, number, number]> = {};
+    for (const cat of CATEGORIES) {
+      const c = new THREE.Color().setHex(cat.hex, THREE.SRGBColorSpace);
+      categoryRgb[cat.id] = [c.r, c.g, c.b];
+    }
 
     // Highlight marker — a single, larger amber point tracking the selection.
     const highlightGeo = new THREE.BufferGeometry();
@@ -360,6 +471,7 @@ export default function SatelliteGlobe() {
       const sats = satsRef.current;
       const gmst = gstime(date);
       const posAttr = satGeo.getAttribute('position') as THREE.BufferAttribute;
+      const colorAttr = satGeo.getAttribute('color') as THREE.BufferAttribute;
       const drawnSats = drawnSatsRef.current;
       drawnSats.length = 0;
       let drawn = 0;
@@ -368,10 +480,15 @@ export default function SatelliteGlobe() {
         const p = pv?.position;
         if (!p || Number.isNaN(p.x)) continue;
         eciToScene(positions, drawn * 3, p);
+        const rgb = categoryRgb[sats[i].category] ?? categoryRgb.other;
+        satColors[drawn * 3] = rgb[0];
+        satColors[drawn * 3 + 1] = rgb[1];
+        satColors[drawn * 3 + 2] = rgb[2];
         drawnSats[drawn] = sats[i];
         drawn++;
       }
       posAttr.needsUpdate = true;
+      colorAttr.needsUpdate = true;
       satGeo.setDrawRange(0, drawn);
 
       // Track the selected satellite with the highlight marker.
@@ -663,6 +780,42 @@ export default function SatelliteGlobe() {
         </span>
       </div>
 
+      {legend.length > 1 && (
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            gap: '0.5rem 1rem',
+            padding: '0.6rem 1rem',
+            borderBottom: '1px solid #262626',
+            fontSize: '0.78rem',
+            color: '#a1a1a1',
+          }}
+        >
+          <span style={{ color: '#a1a1a1' }}>Colour key</span>
+          {legend.map((entry) => (
+            <span
+              key={entry.id}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
+            >
+              <span
+                aria-hidden="true"
+                style={{
+                  width: '0.7rem',
+                  height: '0.7rem',
+                  borderRadius: '50%',
+                  background: entry.css,
+                  flex: '0 0 auto',
+                }}
+              />
+              <span style={{ color: '#ededed' }}>{entry.label}</span>
+              <span>({entry.count})</span>
+            </span>
+          ))}
+        </div>
+      )}
+
       <div style={{ position: 'relative' }}>
         <div ref={mountRef} style={{ width: '100%', lineHeight: 0 }} />
 
@@ -860,6 +1013,30 @@ export default function SatelliteGlobe() {
                 color: '#a1a1a1',
               }}
             >
+              <dt>Category</dt>
+              <dd
+                style={{
+                  margin: 0,
+                  color: '#ededed',
+                  textAlign: 'right',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'flex-end',
+                  gap: '0.4rem',
+                }}
+              >
+                <span
+                  aria-hidden="true"
+                  style={{
+                    width: '0.65rem',
+                    height: '0.65rem',
+                    borderRadius: '50%',
+                    background: (CATEGORY_BY_ID[details.category] ?? CATEGORY_BY_ID.other).css,
+                    flex: '0 0 auto',
+                  }}
+                />
+                {(CATEGORY_BY_ID[details.category] ?? CATEGORY_BY_ID.other).label}
+              </dd>
               <dt>NORAD</dt>
               <dd style={{ margin: 0, color: '#ededed', textAlign: 'right' }}>{details.noradId}</dd>
               <dt>Inclination</dt>
@@ -897,8 +1074,9 @@ export default function SatelliteGlobe() {
         log scale that spreads the crowded low-orbit shells into visible bands),
         toggle layers on or off, and reset the camera. Positions are propagated
         in your browser with SGP4 (satellite.js) from CelesTrak two-line
-        elements. Teal dots are satellites; the globe spins at sidereal rate
-        beneath their inertial orbits.
+        elements. Dots are colour-coded by category (Starlink, OneWeb, space
+        stations, navigation, Iridium, and everything else) per the colour key
+        above; the globe spins at sidereal rate beneath their inertial orbits.
       </figcaption>
     </figure>
   );
