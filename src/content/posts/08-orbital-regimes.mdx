@@ -1,0 +1,86 @@
+---
+title: 'Orbital Regimes: LEO, MEO and GEO'
+description: 'Satellites do not sit just anywhere. They cluster into a few altitude shells, each with its own speed, purpose, and crowd. Meet the neighbourhoods of near-Earth space.'
+pubDate: 2025-02-24
+order: 8
+tags: ['satellites', 'leo', 'geo', 'orbits']
+---
+
+import OrbitalRegimes from '../../components/OrbitalRegimes.tsx';
+
+So far this series has been about the *physics* of a single orbit — gravity,
+speed, ellipses, and how to move between orbits. Now we turn the telescope
+around and look at the **real population** of things circling Earth, the very
+objects you can watch in the [live satellite viewer](/viewer/).
+
+Open that viewer and one thing jumps out immediately: satellites are not
+scattered evenly. They pile up into a handful of distinct **shells**. Those
+shells have names, and knowing them is the key to reading everything else.
+
+## Why altitude decides everything
+
+From [post three](/posts/03-orbital-speed-and-escape/) we know orbital speed
+depends only on distance from Earth's centre:
+
+$$
+v = \sqrt{\frac{G M}{r}}
+$$
+
+And from [Kepler's third law](/posts/04-keplers-laws/), the higher you orbit, the
+**longer** each lap takes. So altitude sets a satellite's speed, its period, how
+much of the planet it can see at once, and how hard it was to haul up there. Pick
+an altitude and you have essentially chosen the satellite's whole personality.
+
+Engineers carve the result into three broad regimes.
+
+<OrbitalRegimes client:visible />
+
+## LEO — Low Earth Orbit
+
+Roughly **160 to 2,000 km** up. This is the basement: cheapest to reach, so it is
+by far the most crowded. A LEO satellite laps the planet in about **90 minutes**,
+screaming along at nearly 8 km/s, and sees only a small patch of ground at a
+time — so global coverage needs *many* of them.
+
+This is where the crewed space stations live, where Hubble looks outward, and
+where the giant internet constellations like **Starlink** spread into the dense
+bands you can see fanning out in the viewer's *LEO structure* mode.
+
+## MEO — Medium Earth Orbit
+
+The wide middle ground, from **2,000 km up to about 35,786 km**. It is mostly
+empty, with one famous set of tenants: the **navigation constellations**. GPS,
+Galileo and GLONASS sit here at around 20,000 km, where a single satellite takes
+roughly **half a day** to orbit and stays above your horizon long enough for a
+receiver to lock several at once and triangulate your position.
+
+## GEO — Geostationary Orbit
+
+A single, razor-thin ring at exactly **35,786 km** directly above the equator. A
+satellite here completes one lap in precisely one Earth day, so it appears to
+**hang motionless** over a fixed point on the ground. That is gold for weather
+imagers and TV/communications relays, which can then point a dish at one spot in
+the sky and never move it. We will spend the [next post](/posts/09-geostationary-orbits/)
+on exactly why this altitude is so special.
+
+## Reading the shells in the viewer
+
+This is the missing manual for that globe. When you switch between *LEO normal*
+(true altitudes) and *LEO structure* (a compressed, log-style scale), you are
+looking at exactly these regimes:
+
+- the tight, busy band hugging the surface is **LEO**;
+- the lonely middle is **MEO**, with the GPS family looping through it;
+- the far-out ring of objects that barely seem to move is **GEO**.
+
+Same data, two mappings — precisely the trade-off the diagram above makes to keep
+LEO legible next to a GEO ring almost six Earth-radii out.
+
+Now that we can name the neighbourhoods, let's understand the most curious one:
+the orbit where a satellite stands perfectly still in the sky.
+
+---
+
+**Previously:** [Lagrange Points ←](/posts/07-lagrange-points/)
+&nbsp;·&nbsp;
+**Next up:** [Geostationary Orbits →](/posts/09-geostationary-orbits/)

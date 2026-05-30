@@ -1,0 +1,85 @@
+---
+title: 'Inclination & Ground Tracks: Why Orbits Lean'
+description: 'Why are some orbits equatorial, some polar, and some tilted just so? Inclination decides — and it draws a signature sine wave on the map called a ground track.'
+pubDate: 2025-03-24
+order: 12
+tags: ['satellites', 'inclination', 'ground-track', 'orbits']
+---
+
+import GroundTrack from '../../components/GroundTrack.tsx';
+
+We've reached the last piece of the puzzle. We can name the
+[regimes](/posts/08-orbital-regimes/), read an
+[orbit's elements](/posts/10-orbital-elements-and-tles/), and
+[propagate](/posts/11-sgp4-propagation/) a satellite to right now. But why does
+the [viewer](/viewer/) show some orbits hugging the equator and others sweeping
+clear over the poles? The answer is a single element: **inclination**.
+
+## What inclination means
+
+**Inclination** is the tilt of the orbital plane relative to Earth's equator.
+
+- **0°** — equatorial: the satellite stays over the equator the whole time.
+- **90°** — polar: the orbit passes over both poles, eventually overflying every
+  point on Earth as the planet rotates beneath it.
+- **Between** — the orbit reaches as far north and south as its inclination, but
+  never higher. A 51.6° orbit (the ISS) never passes over anywhere above 51.6°
+  latitude.
+
+This is a hard geometric ceiling, and it explains a launch fact: you can't reach
+an inclination *lower* than your launch site's latitude without an expensive
+plane change. It also shapes constellations — a whole family of orbits at the
+same inclination weaves the repeating patterns you see draped over the globe.
+
+## The ground track
+
+Trace the point on Earth directly beneath a satellite as it orbits and you get a
+**ground track**. Because the satellite swings north and south while Earth spins
+west-to-east underneath, the track draws a leaning **sine wave** across the map.
+Its height is set by the inclination; each successive lap is shifted westward
+because the planet has rotated during one orbit.
+
+Drag the inclination and watch the wave grow, flatten, and tip into retrograde:
+
+<GroundTrack client:visible />
+
+A few inclinations earn special names:
+
+- **Equatorial (0°)** — a flat line along the equator; where the
+  [geostationary belt](/posts/09-geostationary-orbits/) lives.
+- **ISS (51.6°)** — high enough to overfly most of the populated world, low
+  enough to launch to easily from several spaceports.
+- **Polar (90°)** — sweeps pole to pole; perfect for imaging every spot on Earth.
+- **Sun-synchronous (~98°)** — a slightly *retrograde* tilt chosen so that
+  Earth's equatorial bulge slowly rotates the orbit plane by exactly 360° per
+  year. The orbit then keeps a fixed angle to the Sun, so the satellite crosses
+  the equator at the same **local solar time** on every pass — ideal for imagery
+  with consistent lighting.
+
+## Putting it all together
+
+That sun-synchronous trick is the perfect closing note, because it uses the very
+"imperfection" — Earth's bulge — that forced us to use [SGP4](/posts/11-sgp4-propagation/)
+instead of a textbook ellipse, and *turns it into a feature*.
+
+Across these five posts we have gone from the satellite viewer feeling like magic
+to understanding every part of it:
+
+- satellites live in distinct **[regimes](/posts/08-orbital-regimes/)** — LEO,
+  MEO, and the **[geostationary](/posts/09-geostationary-orbits/)** ring;
+- each orbit is captured by six **[orbital elements](/posts/10-orbital-elements-and-tles/)**,
+  shipped as a **TLE**;
+- **[SGP4](/posts/11-sgp4-propagation/)** turns that snapshot into a live
+  position, the engine inside the viewer;
+- and **inclination** tilts the plane, drawing the ground tracks that pattern the
+  whole globe.
+
+Open the [viewer](/viewer/) once more. None of it is magic now — it's just
+gravity, geometry, and a handful of honest numbers, falling around the planet
+exactly as we've described since [post one](/posts/01-what-is-gravity/).
+
+---
+
+**Previously:** [Tracking Satellites with SGP4 ←](/posts/11-sgp4-propagation/)
+&nbsp;·&nbsp;
+[Back to the start ↺](/)

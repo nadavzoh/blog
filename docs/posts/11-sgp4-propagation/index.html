@@ -1,0 +1,73 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="Astro v5.18.2"><meta name="description" content="A TLE only tells you where a satellite was at one instant. SGP4 is the model that turns that snapshot into a position right now — the exact engine running behind the live viewer."><link rel="icon" type="image/svg+xml" href="/blog/favicon.svg"><link rel="preconnect" href="https://fonts.googleapis.com"><title>Tracking Satellites with SGP4: From Snapshot to Live Position — Orbital Notes</title><link rel="stylesheet" href="/blog/_astro/_slug_.DbXuPfHg.css"></head> <body class="starfield"> <div class="mx-auto flex min-h-screen max-w-3xl flex-col px-5"> <header class="flex items-center justify-between py-6"> <a href="/blog/" class="group flex items-center gap-2 text-lg font-bold tracking-tight"> <span class="inline-block h-3 w-3 rounded-full bg-accent-500 shadow-[0_0_10px_2px_rgba(59,130,246,0.5)] transition group-hover:bg-accent-400"></span> <span>Orbital Notes</span> </a> <nav class="flex gap-5 text-sm text-ink-400"> <a class="transition hover:text-ink-50" href="/blog/">Home</a> <a class="transition hover:text-ink-50" href="/blog/viewer">Viewer</a> <a class="transition hover:text-ink-50" href="/blog/about">About</a> </nav> </header> <main class="flex-1 py-6">  <article class="prose"> <a href="/blog/" class="text-sm text-accent-400 no-underline hover:text-teal-400">
+← Back to all posts
+</a> <header class="mt-6 mb-10 border-b border-surface-800 pb-8"> <p class="mb-3 text-sm font-medium uppercase tracking-wider text-teal-400">
+Part 11 of the series
+</p> <h1 class="!mt-0 text-3xl font-extrabold sm:text-4xl">Tracking Satellites with SGP4: From Snapshot to Live Position</h1> <p class="!mt-3 text-lg text-ink-400">A TLE only tells you where a satellite was at one instant. SGP4 is the model that turns that snapshot into a position right now — the exact engine running behind the live viewer.</p> <div class="mt-4 flex flex-wrap items-center gap-3 text-sm text-ink-400"> <time datetime="2025-03-17T00:00:00.000Z">March 17, 2025</time> <span class="flex flex-wrap gap-2"> <span class="rounded-full bg-surface-800 px-2.5 py-0.5 text-xs text-accent-400">
+#satellites </span><span class="rounded-full bg-surface-800 px-2.5 py-0.5 text-xs text-accent-400">
+#sgp4 </span><span class="rounded-full bg-surface-800 px-2.5 py-0.5 text-xs text-accent-400">
+#tle </span><span class="rounded-full bg-surface-800 px-2.5 py-0.5 text-xs text-accent-400">
+#simulation </span> </span> </div> </header>  <p>In the <a href="/blog/posts/10-orbital-elements-and-tles/">last post</a> we saw that a TLE is a
+snapshot: a set of <a href="/blog/posts/10-orbital-elements-and-tles/">orbital elements</a>
+measured at one instant, the <strong>epoch</strong>. But the satellite never stops moving, and
+the orbit itself slowly changes. To draw a satellite <em>now</em>, you need to carry
+that snapshot forward in time. That step is called <strong>propagation</strong>, and the
+standard model for TLEs is <strong>SGP4</strong>.</p>
+<h2 id="why-you-cant-just-use-kepler">Why you can’t just use Kepler</h2>
+<p>If Earth were a perfect sphere and nothing else pulled on a satellite, a pure
+<a href="/blog/posts/04-keplers-laws/">Keplerian orbit</a> would last forever and simple geometry
+would place it for any future time. Reality is messier:</p>
+<ul>
+<li><strong>Earth is not round.</strong> Its equatorial bulge makes gravity slightly uneven,
+which steadily swivels the orbital plane (it drags the RAAN and argument of
+perigee around over days and weeks).</li>
+<li><strong>The atmosphere drags.</strong> In LEO, faint wisps of air bleed energy, lowering and
+shrinking the orbit over time.</li>
+<li><strong>The Sun and Moon tug</strong>, and sunlight itself nudges the satellite.</li>
+</ul>
+<p>A TLE quietly bakes these perturbing effects into its averaged elements. You
+cannot feed those numbers into a textbook ellipse and get the right answer — they
+were <em>designed</em> to be read by a matching model.</p>
+<h2 id="what-sgp4-does">What SGP4 does</h2>
+<p><strong>SGP4</strong> (Simplified General Perturbations 4) is that matching model. Hand it a
+TLE and a target time, and it returns the satellite’s position and velocity,
+having accounted for the dominant perturbations above. The recipe is fixed and
+public, so anyone — mission control or a web page — gets the same answer:</p>
+<ol>
+<li>Read the elements and epoch from the TLE.</li>
+<li>Compute how far ahead of the epoch you want a position (could be seconds or
+days).</li>
+<li>Apply SGP4’s perturbation formulas to advance the orbit to that moment.</li>
+<li>Out comes a 3D position in an Earth-centred inertial frame.</li>
+<li>Spin that into Earth-fixed coordinates to know which point on the globe it is
+over.</li>
+</ol>
+<p>TLEs and SGP4 are a <strong>matched pair</strong>: the format and the model were built
+together, which is why “a TLE” almost always implies “propagate it with SGP4.”</p>
+<h2 id="the-viewer-made-literal">The viewer, made literal</h2>
+<p>This is the entire engine behind the <a href="/blog/viewer/">live viewer</a>. For every satellite
+it fetches a TLE from CelesTrak, runs SGP4 <strong>in your browser</strong> (via the
+<code>satellite.js</code> library) to get a fresh position for the current simulated time,
+and draws it on the globe — thousands of times, several times a second. The
+time-rate slider simply asks SGP4 for positions further into the future, faster.</p>
+<p>Here is that exact pipeline, embedded right in the page. Pick a group, scrub the
+speed, click a satellite to read the orbital elements straight off its TLE:</p>
+<style>astro-island,astro-slot,astro-static-slot{display:contents}</style><script>(()=>{var e=async t=>{await(await t())()};(self.Astro||(self.Astro={})).only=e;window.dispatchEvent(new Event("astro:only"));})();</script><script>(()=>{var A=Object.defineProperty;var g=(i,o,a)=>o in i?A(i,o,{enumerable:!0,configurable:!0,writable:!0,value:a}):i[o]=a;var d=(i,o,a)=>g(i,typeof o!="symbol"?o+"":o,a);{let i={0:t=>m(t),1:t=>a(t),2:t=>new RegExp(t),3:t=>new Date(t),4:t=>new Map(a(t)),5:t=>new Set(a(t)),6:t=>BigInt(t),7:t=>new URL(t),8:t=>new Uint8Array(t),9:t=>new Uint16Array(t),10:t=>new Uint32Array(t),11:t=>1/0*t},o=t=>{let[l,e]=t;return l in i?i[l](e):void 0},a=t=>t.map(o),m=t=>typeof t!="object"||t===null?t:Object.fromEntries(Object.entries(t).map(([l,e])=>[l,o(e)]));class y extends HTMLElement{constructor(){super(...arguments);d(this,"Component");d(this,"hydrator");d(this,"hydrate",async()=>{var b;if(!this.hydrator||!this.isConnected)return;let e=(b=this.parentElement)==null?void 0:b.closest("astro-island[ssr]");if(e){e.addEventListener("astro:hydrate",this.hydrate,{once:!0});return}let c=this.querySelectorAll("astro-slot"),n={},h=this.querySelectorAll("template[data-astro-template]");for(let r of h){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("data-astro-template")||"default"]=r.innerHTML,r.remove())}for(let r of c){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("name")||"default"]=r.innerHTML)}let p;try{p=this.hasAttribute("props")?m(JSON.parse(this.getAttribute("props"))):{}}catch(r){let s=this.getAttribute("component-url")||"<unknown>",v=this.getAttribute("component-export");throw v&&(s+=` (export ${v})`),console.error(`[hydrate] Error parsing props for component ${s}`,this.getAttribute("props"),r),r}let u;await this.hydrator(this)(this.Component,p,n,{client:this.getAttribute("client")}),this.removeAttribute("ssr"),this.dispatchEvent(new CustomEvent("astro:hydrate"))});d(this,"unmount",()=>{this.isConnected||this.dispatchEvent(new CustomEvent("astro:unmount"))})}disconnectedCallback(){document.removeEventListener("astro:after-swap",this.unmount),document.addEventListener("astro:after-swap",this.unmount,{once:!0})}connectedCallback(){if(!this.hasAttribute("await-children")||document.readyState==="interactive"||document.readyState==="complete")this.childrenConnectedCallback();else{let e=()=>{document.removeEventListener("DOMContentLoaded",e),c.disconnect(),this.childrenConnectedCallback()},c=new MutationObserver(()=>{var n;((n=this.lastChild)==null?void 0:n.nodeType)===Node.COMMENT_NODE&&this.lastChild.nodeValue==="astro:end"&&(this.lastChild.remove(),e())});c.observe(this,{childList:!0}),document.addEventListener("DOMContentLoaded",e)}}async childrenConnectedCallback(){let e=this.getAttribute("before-hydration-url");e&&await import(e),this.start()}async start(){let e=JSON.parse(this.getAttribute("opts")),c=this.getAttribute("client");if(Astro[c]===void 0){window.addEventListener(`astro:${c}`,()=>this.start(),{once:!0});return}try{await Astro[c](async()=>{let n=this.getAttribute("renderer-url"),[h,{default:p}]=await Promise.all([import(this.getAttribute("component-url")),n?import(n):()=>()=>{}]),u=this.getAttribute("component-export")||"default";if(!u.includes("."))this.Component=h[u];else{this.Component=h;for(let f of u.split("."))this.Component=this.Component[f]}return this.hydrator=p,this.hydrate},e,this)}catch(n){console.error(`[astro-island] Error hydrating ${this.getAttribute("component-url")}`,n)}}attributeChangedCallback(){this.hydrate()}}d(y,"observedAttributes",["props"]),customElements.get("astro-island")||customElements.define("astro-island",y)}})();</script><astro-island uid="2v6d4j" component-url="/blog/_astro/SatelliteGlobe.nyeM5HWU.js" component-export="default" renderer-url="/blog/_astro/client.CWUEW1GN.js" props="{}" ssr client="only" opts="{&quot;name&quot;:&quot;SatelliteGlobe&quot;,&quot;value&quot;:&quot;react&quot;}"></astro-island>
+<p>Every dot is a TLE plus SGP4, evaluated live. The orbital elements you read in the
+<a href="/blog/posts/10-orbital-elements-and-tles/">previous post</a> are the input; the moving
+point is the output.</p>
+<h2 id="the-limits">The limits</h2>
+<p>SGP4 is fast and good, but it is an <strong>approximation</strong> tuned for TLE accuracy —
+typically right to about a kilometre near the epoch, drifting as the snapshot
+ages. For pin-point work (docking, precise pass timing) operators use heavier
+models and fresher data, and add effects the viewer skips: your exact location,
+the finite speed of light, and atmospheric refraction bending the line of sight.</p>
+<p>For <em>seeing the shape of near-Earth space</em>, though, it is perfect. One last piece
+remains: why the orbits lean the way they do across the map. That is inclination,
+and the trails it leaves — ground tracks.</p>
+<hr/>
+<p><strong>Previously:</strong> <a href="/blog/posts/10-orbital-elements-and-tles/">Orbital Elements &amp; TLEs ←</a>
+ · 
+<strong>Next up:</strong> <a href="/blog/posts/12-inclination-and-ground-tracks/">Inclination &amp; Ground Tracks →</a></p>  </article>  </main> <footer class="border-t border-surface-800 py-8 text-sm text-ink-400"> <p>
+Orbital Notes — a friendly tour of how things fly through space.
+          Built with Astro, React islands & KaTeX.
+</p> </footer> </div> </body></html>

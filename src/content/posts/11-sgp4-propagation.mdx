@@ -1,0 +1,86 @@
+---
+title: 'Tracking Satellites with SGP4: From Snapshot to Live Position'
+description: 'A TLE only tells you where a satellite was at one instant. SGP4 is the model that turns that snapshot into a position right now — the exact engine running behind the live viewer.'
+pubDate: 2025-03-17
+order: 11
+tags: ['satellites', 'sgp4', 'tle', 'simulation']
+---
+
+import SatelliteGlobe from '../../components/SatelliteGlobe.tsx';
+
+In the [last post](/posts/10-orbital-elements-and-tles/) we saw that a TLE is a
+snapshot: a set of [orbital elements](/posts/10-orbital-elements-and-tles/)
+measured at one instant, the **epoch**. But the satellite never stops moving, and
+the orbit itself slowly changes. To draw a satellite *now*, you need to carry
+that snapshot forward in time. That step is called **propagation**, and the
+standard model for TLEs is **SGP4**.
+
+## Why you can't just use Kepler
+
+If Earth were a perfect sphere and nothing else pulled on a satellite, a pure
+[Keplerian orbit](/posts/04-keplers-laws/) would last forever and simple geometry
+would place it for any future time. Reality is messier:
+
+- **Earth is not round.** Its equatorial bulge makes gravity slightly uneven,
+  which steadily swivels the orbital plane (it drags the RAAN and argument of
+  perigee around over days and weeks).
+- **The atmosphere drags.** In LEO, faint wisps of air bleed energy, lowering and
+  shrinking the orbit over time.
+- **The Sun and Moon tug**, and sunlight itself nudges the satellite.
+
+A TLE quietly bakes these perturbing effects into its averaged elements. You
+cannot feed those numbers into a textbook ellipse and get the right answer — they
+were *designed* to be read by a matching model.
+
+## What SGP4 does
+
+**SGP4** (Simplified General Perturbations 4) is that matching model. Hand it a
+TLE and a target time, and it returns the satellite's position and velocity,
+having accounted for the dominant perturbations above. The recipe is fixed and
+public, so anyone — mission control or a web page — gets the same answer:
+
+1. Read the elements and epoch from the TLE.
+2. Compute how far ahead of the epoch you want a position (could be seconds or
+   days).
+3. Apply SGP4's perturbation formulas to advance the orbit to that moment.
+4. Out comes a 3D position in an Earth-centred inertial frame.
+5. Spin that into Earth-fixed coordinates to know which point on the globe it is
+   over.
+
+TLEs and SGP4 are a **matched pair**: the format and the model were built
+together, which is why "a TLE" almost always implies "propagate it with SGP4."
+
+## The viewer, made literal
+
+This is the entire engine behind the [live viewer](/viewer/). For every satellite
+it fetches a TLE from CelesTrak, runs SGP4 **in your browser** (via the
+`satellite.js` library) to get a fresh position for the current simulated time,
+and draws it on the globe — thousands of times, several times a second. The
+time-rate slider simply asks SGP4 for positions further into the future, faster.
+
+Here is that exact pipeline, embedded right in the page. Pick a group, scrub the
+speed, click a satellite to read the orbital elements straight off its TLE:
+
+<SatelliteGlobe client:only="react" />
+
+Every dot is a TLE plus SGP4, evaluated live. The orbital elements you read in the
+[previous post](/posts/10-orbital-elements-and-tles/) are the input; the moving
+point is the output.
+
+## The limits
+
+SGP4 is fast and good, but it is an **approximation** tuned for TLE accuracy —
+typically right to about a kilometre near the epoch, drifting as the snapshot
+ages. For pin-point work (docking, precise pass timing) operators use heavier
+models and fresher data, and add effects the viewer skips: your exact location,
+the finite speed of light, and atmospheric refraction bending the line of sight.
+
+For *seeing the shape of near-Earth space*, though, it is perfect. One last piece
+remains: why the orbits lean the way they do across the map. That is inclination,
+and the trails it leaves — ground tracks.
+
+---
+
+**Previously:** [Orbital Elements & TLEs ←](/posts/10-orbital-elements-and-tles/)
+&nbsp;·&nbsp;
+**Next up:** [Inclination & Ground Tracks →](/posts/12-inclination-and-ground-tracks/)

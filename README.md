@@ -3,7 +3,8 @@
 A personal blog of explanatory **space & orbit physics** posts, with interactive
 React components embedded directly in MDX. The series assumes **no prior
 knowledge** of physics or the space domain and builds up one post at a time —
-from "what is gravity?" all the way to interplanetary Hohmann transfers.
+from "what is gravity?" all the way to interplanetary transfers and the live
+satellite viewer.
 
 ## Stack
 
@@ -24,6 +25,11 @@ from "what is gravity?" all the way to interplanetary Hohmann transfers.
 5. **Hohmann Transfers** — moving between orbits (`HohmannTransfer`)
 6. **Gravity Assists** — stealing speed from planets (`GravityAssist`)
 7. **Lagrange Points** — parking spots in space (`LagrangePoints`)
+8. **Orbital Regimes** — LEO, MEO and GEO shells (`OrbitalRegimes`)
+9. **Geostationary Orbits** — standing still in the sky (`GeostationaryOrbit`)
+10. **Orbital Elements & TLEs** — an orbit in six numbers (`OrbitalElements`)
+11. **Tracking Satellites with SGP4** — snapshot to live position (`SatelliteGlobe`)
+12. **Inclination & Ground Tracks** — why orbits lean (`GroundTrack`)
 
 ## Project structure
 

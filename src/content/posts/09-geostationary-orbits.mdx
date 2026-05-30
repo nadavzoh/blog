@@ -1,0 +1,88 @@
+---
+title: 'Geostationary Orbits: Standing Still in the Sky'
+description: 'At one precise altitude a satellite circles Earth exactly once per day, so it appears to hover over a fixed spot. Here is why ~35,786 km is such magic — straight out of Kepler.'
+pubDate: 2025-03-03
+order: 9
+tags: ['satellites', 'geo', 'kepler', 'mission-design']
+---
+
+import GeostationaryOrbit from '../../components/GeostationaryOrbit.tsx';
+
+In the [last post](/posts/08-orbital-regimes/) we met the three orbital regimes
+and saw that **GEO** is a single thin ring where satellites seem to hang
+motionless. That trick — a satellite that never moves across your sky — powers
+satellite TV, weather imaging, and a huge slice of global communications. Let's
+see exactly why it works, and why it happens at one specific height.
+
+## One altitude, one period
+
+The whole idea rests on [Kepler's third law](/posts/04-keplers-laws/), which ties
+an orbit's size to its period. For a circular orbit of radius $r$ around Earth:
+
+$$
+T = 2\pi \sqrt{\frac{r^3}{\mu}}
+$$
+
+where $\mu = GM$ is Earth's gravitational parameter. The period grows with
+altitude, smoothly and predictably. So there is **exactly one** altitude where
+the period equals the time it takes Earth to spin once. Match those two and the
+satellite turns in perfect lockstep with the ground below it.
+
+Drag the slider until the orbital period lines up with Earth's rotation:
+
+<GeostationaryOrbit client:visible />
+
+That crossover lands at about **35,786 km** above the surface (a radius of
+~42,164 km from Earth's centre). Below it, the satellite outruns the planet and
+drifts **east**; above it, it lags behind and slips **west**. Only at the magic
+altitude does it hold station.
+
+## Sidereal vs. solar: the 23h 56m subtlety
+
+Notice the target period is **23 hours 56 minutes**, not a round 24 hours. That
+is the *sidereal* day — one full spin of Earth relative to the distant stars. The
+familiar 24-hour *solar* day is slightly longer because Earth also moves a little
+along its orbit around the Sun each day, so it has to turn an extra ~1° to bring
+the Sun back overhead. A satellite keeps step with the **stars-frame** rotation,
+so the sidereal day is the number that matters.
+
+## Geostationary vs. geosynchronous
+
+Two words that get muddled:
+
+- **Geosynchronous** — any orbit with a one-day period. It returns to the same
+  spot at the same time each day, but if it is **tilted** (inclined) it traces a
+  figure-eight in the sky over a day rather than sitting still.
+- **Geostationary** — the special case that is *also* directly over the equator
+  (zero inclination) and circular. Only this one truly **hovers**.
+
+That equator requirement is why the geostationary belt is a single shared ring of
+real estate — and why slots in it are carefully allocated.
+
+## Why we put things there
+
+A geostationary satellite buys you two superpowers:
+
+- **Fixed aim.** A ground dish can point at one patch of sky and never move,
+  which is exactly what made home satellite TV practical.
+- **A constant hemisphere view.** From 35,786 km up, one satellite sees nearly
+  half the planet at once. Three of them, spaced 120° apart, blanket almost the
+  entire globe — the backbone of weather monitoring and global relays.
+
+The cost is distance: signals travel ~36,000 km each way, adding a noticeable
+delay, and reaching that altitude takes far more energy than LEO. That trade-off
+is exactly why the [low shells](/posts/08-orbital-regimes/) stay so crowded while
+the GEO ring holds a smaller, premium crowd.
+
+In the viewer, GEO is the faraway ring of objects that barely seem to drift. Now
+you know they are not frozen — they are orbiting at over 3 km/s, just perfectly
+matched to the planet turning beneath them.
+
+Next, we open up a satellite's "ID card" — the handful of numbers that pin down
+any orbit, and the text format the viewer actually downloads to place each one.
+
+---
+
+**Previously:** [Orbital Regimes ←](/posts/08-orbital-regimes/)
+&nbsp;·&nbsp;
+**Next up:** [Orbital Elements & TLEs →](/posts/10-orbital-elements-and-tles/)

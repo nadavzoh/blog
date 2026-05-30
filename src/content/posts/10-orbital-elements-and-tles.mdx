@@ -1,0 +1,76 @@
+---
+title: 'Orbital Elements & TLEs: An Orbit in Six Numbers'
+description: 'A whole orbit — its size, shape, tilt and where the satellite is on it — fits in a handful of numbers. Meet the orbital elements and the cryptic two-line format the viewer downloads.'
+pubDate: 2025-03-10
+order: 10
+tags: ['satellites', 'orbital-elements', 'tle', 'data']
+---
+
+import OrbitalElements from '../../components/OrbitalElements.tsx';
+
+We can now name the [orbital regimes](/posts/08-orbital-regimes/) and explain the
+[geostationary belt](/posts/09-geostationary-orbits/). But how does the
+[live viewer](/viewer/) actually *know* where ten thousand satellites are? It
+downloads a tiny text file for each one. To read it, you need the language of
+**orbital elements**.
+
+## Six numbers fix an orbit
+
+An orbit floating in 3D space is fully described by just six quantities — the
+classical **Keplerian elements**. Two set the ellipse's size and shape, three
+orient that ellipse in space, and one says where the satellite currently sits on
+it:
+
+- **Semi-major axis ($a$)** — the orbit's size, which (via
+  [Kepler](/posts/04-keplers-laws/)) also fixes its period.
+- **Eccentricity ($e$)** — its shape, from a perfect circle ($e = 0$) to an
+  ever-more-stretched ellipse.
+- **Inclination ($i$)** — how tilted the orbital plane is relative to the
+  equator. (The star of the [next post](/posts/12-inclination-and-ground-tracks/).)
+- **Right ascension of the ascending node (RAAN, $\Omega$)** — the swivel of the
+  plane: where the orbit crosses the equator going north.
+- **Argument of perigee ($\omega$)** — the rotation of the ellipse *within* its
+  plane: which way the low point (perigee) faces.
+- **True/mean anomaly** — the satellite's position along the orbit right now.
+
+The first two shape the orbit; the next three aim it; the last is the clock hand.
+Drag the sliders below to feel two of them directly — stretching the ellipse with
+eccentricity and swinging perigee around with the argument of perigee:
+
+<OrbitalElements client:visible />
+
+## The TLE: an orbit as two lines of text
+
+Those elements are shipped around the world in a 1960s-era format called a
+**two-line element set**, or **TLE**. It is dense, fixed-width, and at first
+glance unreadable — but every field is in there. The block above highlights the
+key ones; hover them to see what each cryptic number means.
+
+Line 2 carries the geometry: **inclination**, **RAAN**, **eccentricity**
+(written without its leading "0."), **argument of perigee**, **mean anomaly**, and
+**mean motion** — the number of orbits per day, which is just the period in
+disguise. Line 1 carries bookkeeping: the catalog number and, crucially, the
+**epoch** — the exact moment those numbers were measured.
+
+## Where the viewer gets them
+
+The viewer pulls fresh TLEs straight from
+[CelesTrak](https://celestrak.org/), which republishes the orbital data the
+U.S. Space Force tracks for tens of thousands of objects. Each satellite's
+detail panel in the viewer — inclination, period, apogee, perigee, eccentricity —
+is simply these same elements, decoded from its TLE and shown in friendlier
+units.
+
+But a TLE is only a **snapshot** at its epoch. Satellites drift: the atmosphere
+drags on them, Earth's lumpy gravity tugs at them, the Sun and Moon pull. So the
+numbers slowly go stale, which is why fresh sets are published constantly.
+
+That raises the real question behind the live globe: given a snapshot from some
+moment in the past, how do you compute where the satellite is *right now*? That is
+the job of a propagation model — and it is what we turn to next.
+
+---
+
+**Previously:** [Geostationary Orbits ←](/posts/09-geostationary-orbits/)
+&nbsp;·&nbsp;
+**Next up:** [Tracking Satellites with SGP4 →](/posts/11-sgp4-propagation/)
