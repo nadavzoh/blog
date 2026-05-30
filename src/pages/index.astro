@@ -28,7 +28,7 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort(
         posts.map((post) => (
           <li>
             <a
-              href={`/posts/${post.id}/`}
+              href={`${import.meta.env.BASE_URL}posts/${post.id}/`}
               class="group block rounded-xl border border-void-800 bg-void-900/50 p-5 transition hover:border-nebula-500/60 hover:bg-void-800/50"
             >
               <div class="flex items-baseline gap-3">

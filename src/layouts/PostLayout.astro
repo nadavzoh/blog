@@ -18,7 +18,7 @@ const formattedDate = pubDate.toLocaleDateString('en-US', {
 
 <BaseLayout title={`${title} — Orbital Notes`} description={description}>
   <article class="prose">
-    <a href="/" class="text-sm text-nebula-400 no-underline hover:text-aurora-400">
+    <a href={import.meta.env.BASE_URL} class="text-sm text-nebula-400 no-underline hover:text-aurora-400">
       ← Back to all posts
     </a>
 

@@ -16,7 +16,7 @@ const { title, description = 'Explanatory posts on space and orbital physics.' }
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}favicon.svg`} />
     <link
       rel="preconnect"
       href="https://fonts.googleapis.com"
@@ -26,15 +26,15 @@ const { title, description = 'Explanatory posts on space and orbital physics.' }
   <body class="starfield">
     <div class="mx-auto flex min-h-screen max-w-3xl flex-col px-5">
       <header class="flex items-center justify-between py-6">
-        <a href="/" class="group flex items-center gap-2 text-lg font-bold tracking-tight">
+        <a href={import.meta.env.BASE_URL} class="group flex items-center gap-2 text-lg font-bold tracking-tight">
           <span
             class="inline-block h-3 w-3 rounded-full bg-nebula-400 shadow-[0_0_12px_3px_rgba(108,124,255,0.6)] transition group-hover:bg-aurora-400"
           ></span>
           <span>Orbital Notes</span>
         </a>
         <nav class="flex gap-5 text-sm text-star-400">
-          <a class="transition hover:text-star-200" href="/">Home</a>
-          <a class="transition hover:text-star-200" href="/about">About</a>
+          <a class="transition hover:text-star-200" href={import.meta.env.BASE_URL}>Home</a>
+          <a class="transition hover:text-star-200" href={`${import.meta.env.BASE_URL}about`}>About</a>
         </nav>
       </header>
 

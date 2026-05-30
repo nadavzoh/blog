@@ -22,6 +22,8 @@ from "what is gravity?" all the way to interplanetary Hohmann transfers.
 3. **Orbital Speed & Escape Velocity** — how fast is fast enough (`OrbitalVelocity`)
 4. **Kepler's Laws** — the shape and rhythm of orbits (`KeplerThirdLaw`)
 5. **Hohmann Transfers** — moving between orbits (`HohmannTransfer`)
+6. **Gravity Assists** — stealing speed from planets (`GravityAssist`)
+7. **Lagrange Points** — parking spots in space (`LagrangePoints`)
 
 ## Project structure
 
@@ -44,6 +46,21 @@ src/
 | `npm run build`       | Build the production site to `./dist/`   |
 | `npm run preview`     | Preview the production build locally     |
 | `npm run astro check` | Type-check Astro, MDX and TS files       |
+
+## Deployment (GitHub Pages)
+
+The site is deployed to **GitHub Pages** at
+`https://nadavzoh.github.io/blog/` by the workflow in
+[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml).
+
+Because it is a *project* site served from the `/blog/` sub-path, `astro.config.mjs`
+sets `site` and `base: '/blog'`. Posts can still use clean root-relative links
+(e.g. `/posts/...`); a small rehype plugin rewrites them to include the base at
+build time.
+
+To enable it once on GitHub: open **Settings → Pages**, set **Source** to
+**GitHub Actions**. Every push to the `main` branch then builds and publishes the
+site automatically (you can also trigger it manually from the **Actions** tab).
 
 ## How the interactivity works
 
