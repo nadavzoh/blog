@@ -1,0 +1,62 @@
+---
+title: 'What Is Gravity, Really?'
+description: 'Before we can talk about orbits, we need to understand the force that makes them. Meet the inverse-square law.'
+pubDate: 2025-01-06
+order: 1
+tags: ['gravity', 'basics', 'newton']
+---
+
+import GravityWell from '../../components/GravityWell.tsx';
+
+Welcome to **Orbital Notes**. Over this short series we'll build up — from
+absolute scratch — an understanding of how spacecraft, moons, and planets move
+through space. No prior physics needed. We start at the very beginning: the
+force behind everything that follows.
+
+## Gravity is just attraction
+
+Every object with mass pulls on every other object with mass. You pull on the
+Earth, and the Earth pulls on you. The reason *you* notice the Earth's pull (and
+not the other way around) is that the Earth is enormously more massive.
+
+Isaac Newton wrote this down in 1687 as the **law of universal gravitation**:
+
+$$
+F = G\,\frac{m_1 m_2}{r^2}
+$$
+
+Let's decode every symbol, because this one equation powers the entire series:
+
+- $F$ — the gravitational force between the two objects.
+- $m_1$ and $m_2$ — the two masses (say, a planet and a satellite).
+- $r$ — the distance **between their centres**.
+- $G$ — the *gravitational constant*, a tiny fixed number,
+  $G \approx 6.674 \times 10^{-11}$, that sets the overall strength of gravity.
+
+## The most important part: that little $r^2$
+
+Notice the distance $r$ is **squared** and sits on the *bottom* of the fraction.
+That single detail shapes everything in space. It means gravity follows an
+**inverse-square law**: double your distance and the force doesn't halve — it
+drops to a *quarter*. Triple it, and you're down to a *ninth*.
+
+Drag the slider below to move away from Earth and watch the force collapse:
+
+<GravityWell client:visible />
+
+See how steeply the curve falls near the surface and then flattens out? Gravity
+never quite reaches zero — it just gets weaker and weaker forever. That "weak but
+never gone" tail is exactly what lets distant moons stay bound to their planets.
+
+## Why this matters for orbits
+
+Here's the key idea to carry forward: gravity is **always pulling you toward the
+centre** of whatever massive body you're near. It never pushes. So if everything
+is being pulled *down*, how does anything stay *up* in space?
+
+That puzzle — how to fall without ever hitting the ground — is the secret of
+orbits, and it's exactly where we go next.
+
+---
+
+**Next up:** [Newton's Cannonball →](/posts/02-newtons-cannonball/)

@@ -1,0 +1,68 @@
+---
+title: 'Orbital Speed & Escape Velocity'
+description: 'How fast is "fast enough" to orbit — and how much faster must you go to leave a world behind forever? Two formulas, one slider.'
+pubDate: 2025-01-20
+order: 3
+tags: ['velocity', 'escape', 'energy']
+---
+
+import OrbitalVelocity from '../../components/OrbitalVelocity.tsx';
+
+Last time we derived the speed needed for a circular orbit:
+
+$$
+v_{\text{orbit}} = \sqrt{\frac{G M}{r}}
+$$
+
+Now let's make it concrete, and then ask the natural follow-up question: what if
+you want to leave the planet *entirely* and never come back?
+
+## From orbiting to escaping
+
+Recall gravity never truly reaches zero — it just fades with distance. To escape
+a planet, you don't need to "outrun" gravity all at once; you need enough speed
+that gravity can keep slowing you down forever **without ever stopping you.**
+
+Working that out with energy (the kinetic energy you start with must cover all
+the gravitational energy you'd ever lose) gives the **escape velocity**:
+
+$$
+v_{\text{escape}} = \sqrt{\frac{2 G M}{r}} = \sqrt{2}\; v_{\text{orbit}}
+$$
+
+That factor of $\sqrt{2} \approx 1.41$ is a lovely result: **escape speed is just
+about 41% faster than orbital speed** at any given altitude. If you're already
+circling a planet, you're already most of the way to leaving it.
+
+## Play with real worlds
+
+Pick a body and an altitude below. The numbers are computed from the real masses
+and radii of each world:
+
+<OrbitalVelocity client:visible />
+
+A few things worth noticing as you experiment:
+
+- **Earth at ~400 km** (where the ISS lives) needs about $7.7\ \text{km/s}$ to
+  orbit — roughly 27,000 km/h. Space is less about going *up* and more about
+  going *sideways* outrageously fast.
+- **The Moon** is gentle: its low mass means low orbital and escape speeds. This
+  is exactly why the Apollo lunar module could take off from the Moon with a
+  tiny engine.
+- **Jupiter** is brutal: enormous mass means enormous speeds. Escaping Jupiter is
+  far harder than escaping Earth.
+- For **every** body, the escape number is always $\sqrt{2}$ times the orbit
+  number. Switch worlds and the ratio holds.
+
+## Where we're headed
+
+So far we've only talked about perfect circles. But real orbits — comets,
+planets, spacecraft — are usually **stretched ovals** called ellipses. To
+understand those, we turn to the astronomer who figured out their rules a
+*lifetime before* Newton explained why: Johannes Kepler.
+
+---
+
+**Previously:** [Newton's Cannonball ←](/posts/02-newtons-cannonball/)
+&nbsp;·&nbsp;
+**Next up:** [Kepler's Laws →](/posts/04-keplers-laws/)

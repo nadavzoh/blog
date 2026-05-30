@@ -1,0 +1,75 @@
+---
+title: "Newton's Cannonball: What an Orbit Actually Is"
+description: 'An orbit is not "zero gravity." It is falling so fast sideways that you keep missing the planet. Fire the cannon and see for yourself.'
+pubDate: 2025-01-13
+order: 2
+tags: ['orbits', 'newton', 'free-fall']
+---
+
+import OrbitSimulator from '../../components/OrbitSimulator.tsx';
+
+In [the last post](/posts/01-what-is-gravity/) we learned that gravity is always
+pulling you toward the centre of a planet. So a natural question is: why doesn't
+the International Space Station just fall down?
+
+The surprising answer: **it is falling.** Constantly. It just keeps missing the
+Earth.
+
+## A cannon on an impossibly tall mountain
+
+Newton imagined firing a cannonball horizontally from a mountain so tall it
+pokes above the atmosphere (so there's no air to slow things down).
+
+- Fire it **slowly**, and it arcs downward and crashes into the ground — just
+  like throwing a ball.
+- Fire it **faster**, and it travels farther before landing, because the ground
+  curves away beneath it.
+- Fire it at *just the right speed*, and the ground curves away **exactly as
+  fast as the ball falls.** Now it never lands. It falls around the planet
+  forever. **That is an orbit.**
+- Fire it **too fast**, and it climbs away and never comes back — it *escapes*.
+
+Try all four outcomes yourself. Drag the speed slider and re-launch:
+
+<OrbitSimulator client:visible />
+
+## Orbiting is continuous free-fall
+
+This is worth pausing on, because it's the single most counter-intuitive idea in
+spaceflight. Astronauts float **not** because there's no gravity up there — at
+the ISS's altitude gravity is still about 90% as strong as on the ground. They
+float because they and their spacecraft are *all falling together* at the same
+rate. Free-fall feels like weightlessness.
+
+## The speed that keeps you in orbit
+
+For a perfectly circular orbit, there's exactly one speed that works at a given
+distance $r$ from the centre of a planet with mass $M$. We can find it by setting
+gravity equal to the "centripetal" pull needed to bend a path into a circle:
+
+$$
+\frac{G M m}{r^2} = \frac{m v^2}{r}
+$$
+
+The satellite's own mass $m$ cancels from both sides — a heavy satellite and a
+light one orbit at the *same* speed. Solving for $v$:
+
+$$
+v_{\text{orbit}} = \sqrt{\frac{G M}{r}}
+$$
+
+Two things fall out of this neat formula:
+
+1. **Lower orbits are faster.** Smaller $r$ means a bigger $v$. The ISS skims
+   close to Earth and races around in about 90 minutes.
+2. **It depends on the planet, not on you.** Only the planet's mass $M$ and your
+   distance $r$ matter.
+
+In the next post we'll put real numbers into this formula, and discover its
+close cousin — the speed you need to break free of a planet entirely.
+
+---
+
+**Previously:** [What Is Gravity? ←](/posts/01-what-is-gravity/)
+&nbsp;·&nbsp;
+**Next up:** [Orbital Speed & Escape Velocity →](/posts/03-orbital-speed-and-escape/)

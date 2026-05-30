@@ -1,0 +1,115 @@
+@import 'tailwindcss';
+@import 'katex/dist/katex.min.css';
+
+/* Tailwind v4 theme tokens for the space/orbit aesthetic */
+@theme {
+  --color-void-950: #050714;
+  --color-void-900: #0a0f24;
+  --color-void-800: #111634;
+  --color-nebula-400: #8b9dff;
+  --color-nebula-500: #6c7cff;
+  --color-aurora-400: #4fd1c5;
+  --color-aurora-500: #2cb5a8;
+  --color-star-200: #e7ecff;
+  --color-star-400: #aab4d4;
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  color-scheme: dark;
+  scroll-behavior: smooth;
+}
+
+body {
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(108, 124, 255, 0.18), transparent 60%),
+    radial-gradient(900px 500px at 0% 10%, rgba(79, 209, 197, 0.12), transparent 55%),
+    var(--color-void-950);
+  color: var(--color-star-200);
+  min-height: 100vh;
+}
+
+/* Subtle starfield */
+.starfield::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, rgba(255, 255, 255, 0.7), transparent),
+    radial-gradient(1px 1px at 70% 60%, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(1.5px 1.5px at 40% 80%, rgba(255, 255, 255, 0.6), transparent),
+    radial-gradient(1px 1px at 90% 20%, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(1px 1px at 50% 50%, rgba(255, 255, 255, 0.4), transparent);
+  background-size: 100% 100%;
+}
+
+/* Prose styling for MDX content */
+.prose {
+  line-height: 1.75;
+  font-size: 1.05rem;
+}
+.prose h1,
+.prose h2,
+.prose h3 {
+  color: var(--color-star-200);
+  font-weight: 700;
+  line-height: 1.2;
+  margin-top: 2.2rem;
+  margin-bottom: 0.9rem;
+}
+.prose h2 {
+  font-size: 1.6rem;
+}
+.prose h3 {
+  font-size: 1.25rem;
+}
+.prose p {
+  margin: 1rem 0;
+  color: var(--color-star-200);
+}
+.prose a {
+  color: var(--color-nebula-400);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.prose a:hover {
+  color: var(--color-aurora-400);
+}
+.prose ul,
+.prose ol {
+  margin: 1rem 0;
+  padding-left: 1.4rem;
+}
+.prose li {
+  margin: 0.4rem 0;
+}
+.prose ul {
+  list-style: disc;
+}
+.prose ol {
+  list-style: decimal;
+}
+.prose strong {
+  color: var(--color-star-200);
+}
+.prose code {
+  background: var(--color-void-800);
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.35rem;
+  font-size: 0.9em;
+}
+.prose blockquote {
+  border-left: 3px solid var(--color-nebula-500);
+  padding-left: 1rem;
+  margin: 1.2rem 0;
+  color: var(--color-star-400);
+  font-style: italic;
+}
+.prose hr {
+  border: none;
+  border-top: 1px solid var(--color-void-800);
+  margin: 2.5rem 0;
+}
