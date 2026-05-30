@@ -9,7 +9,6 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort(
   (a, b) => a.data.order - b.data.order,
 );
 
-const featured = posts.slice(0, 2);
 const categories = categoriesOf(posts);
 
 const href = (id: string) => `${base}posts/${id}/`;
@@ -32,58 +31,10 @@ const href = (id: string) => `${base}posts/${id}/`;
       one post at a time, to how spacecraft move between worlds — with simulations you can
       poke at along the way.
     </p>
-    <form
-      class="demo-form mx-auto mt-8 flex max-w-md items-center gap-2"
-     
-      aria-label="Subscribe (demo)"
-    >
-      <input
-        type="email"
-        placeholder="Your email"
-        class="h-11 flex-1 rounded-full border border-line bg-card px-4 text-sm text-ink-900 outline-none placeholder:text-ink-400 focus:border-brand-400"
-      />
-      <button
-        type="submit"
-        class="h-11 rounded-full bg-brand-500 px-5 text-sm font-semibold text-white transition hover:bg-brand-600"
-      >
-        Subscribe
-      </button>
-    </form>
-  </section>
-
-  {/* Featured */}
-  <section class="mt-6 grid gap-6 sm:grid-cols-2">
-    {
-      featured.map((post) => (
-        <a href={href(post.id)} class="group card card-hover flex flex-col overflow-hidden sm:flex-row">
-          <img src={coverFor(post, base)} alt="" class="cover sm:w-2/5" loading="lazy" />
-          <div class="flex flex-1 flex-col p-5">
-            <div class="flex items-center justify-between gap-3 text-xs text-ink-400">
-              <time datetime={post.data.pubDate.toISOString()}>
-                {formatDate(post.data.pubDate)}
-              </time>
-              <span class="badge">{post.data.category}</span>
-            </div>
-            <h3 class="mt-3 text-lg font-bold leading-snug text-ink-900 transition group-hover:text-brand-600">
-              {post.data.title}
-            </h3>
-            <p class="mt-2 line-clamp-2 text-sm text-ink-500">{post.data.description}</p>
-            <div class="mt-auto flex items-center justify-between pt-4 text-sm text-ink-500">
-              <span>{post.data.author}</span>
-              <span class="open-dot" aria-hidden="true">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                  <path d="M7 17 17 7M9 7h8v8" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-              </span>
-            </div>
-          </div>
-        </a>
-      ))
-    }
   </section>
 
   {/* Articles grid */}
-  <section id="blogs" class="mt-20 scroll-mt-24">
+  <section id="blogs" class="mt-16 scroll-mt-24">
     <p class="text-sm font-semibold uppercase tracking-wider text-brand-600">Articles</p>
     <h2
       class="mt-2 text-3xl font-bold tracking-tight text-ink-900 sm:text-4xl"
@@ -97,11 +48,11 @@ const href = (id: string) => `${base}posts/${id}/`;
     </p>
 
     <div class="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <div id="filters" class="flex flex-wrap gap-1.5 rounded-full border border-line bg-card p-1.5">
-        <button class="tab" data-filter="all" aria-selected="true">All</button>
+      <div id="filters" class="-mx-5 flex gap-1.5 overflow-x-auto scroll-px-5 px-5 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:rounded-full sm:border sm:border-line sm:bg-card sm:px-1.5 sm:py-1.5">
+        <button class="tab shrink-0 whitespace-nowrap" data-filter="all" aria-selected="true">All</button>
         {
           categories.map((cat) => (
-            <button class="tab" data-filter={cat} aria-selected="false">
+            <button class="tab shrink-0 whitespace-nowrap" data-filter={cat} aria-selected="false">
               {cat}
             </button>
           ))
@@ -168,38 +119,6 @@ const href = (id: string) => `${base}posts/${id}/`;
     </ul>
     <p id="empty" class="mt-10 hidden text-center text-ink-400">No articles match your search.</p>
   </section>
-
-  {/* Newsletter CTA */}
-  <section class="mt-20">
-    <div class="card grid items-stretch gap-0 overflow-hidden md:grid-cols-2">
-      <img src={`${base}covers/cta.svg`} alt="" class="h-full w-full object-cover" />
-      <div class="flex flex-col justify-center p-8 sm:p-10">
-        <h2
-          class="text-2xl font-bold leading-snug text-ink-900 sm:text-3xl"
-          style="font-family: var(--font-display)"
-        >
-          Explore the cosmos, one orbit at a time.
-        </h2>
-        <p class="mt-3 text-ink-500">
-          New interactive explainers on gravity, orbits and satellites. Drop your email and
-          follow the series from the very first post.
-        </p>
-        <form class="demo-form mt-6 flex max-w-md items-center gap-2">
-          <input
-            type="email"
-            placeholder="Your email"
-            class="h-11 flex-1 rounded-full border border-line bg-card px-4 text-sm text-ink-900 outline-none placeholder:text-ink-400 focus:border-brand-400"
-          />
-          <button
-            type="submit"
-            class="h-11 rounded-full bg-brand-500 px-5 text-sm font-semibold text-white transition hover:bg-brand-600"
-          >
-            Subscribe
-          </button>
-        </form>
-      </div>
-    </div>
-  </section>
 </BaseLayout>
 
 <script>
@@ -235,9 +154,4 @@ const href = (id: string) => `${base}posts/${id}/`;
     apply();
   });
   search?.addEventListener('input', apply);
-
-  // Demo subscribe forms: prevent navigation/reload (no backend here).
-  document.querySelectorAll<HTMLFormElement>('form.demo-form').forEach((form) => {
-    form.addEventListener('submit', (e) => e.preventDefault());
-  });
 </script>
