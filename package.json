@@ -23,7 +23,12 @@
     "recharts": "^2.15.4",
     "rehype-katex": "^7.0.1",
     "remark-math": "^6.0.0",
+    "satellite.js": "^7.0.1",
     "tailwindcss": "^4.3.0",
+    "three": "^0.184.0",
     "typescript": "^6.0.3"
+  },
+  "devDependencies": {
+    "@types/three": "^0.184.1"
   }
 }
