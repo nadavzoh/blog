@@ -44,7 +44,7 @@ time — so global coverage needs *many* of them.
 
 This is where the crewed space stations live, where Hubble looks outward, and
 where the giant internet constellations like **Starlink** spread into the dense
-bands you can see fanning out in the viewer's *LEO structure* mode.
+bands you can see fanning out in the viewer's *Shell view* mode.
 
 ## MEO — Medium Earth Orbit
 
@@ -65,9 +65,23 @@ on exactly why this altitude is so special.
 
 ## Reading the shells in the viewer
 
-This is the missing manual for that globe. When you switch between *LEO normal*
-(true altitudes) and *LEO structure* (a compressed, log-style scale), you are
-looking at exactly these regimes:
+This is the missing manual for that globe. The viewer offers two view modes, and
+the names describe exactly what each one does to altitude:
+
+- **True scale** draws every satellite at its *real* altitude. It is honest, but
+  because LEO is only a few hundred kilometres up while GEO sits almost six Earth
+  radii out, the low-orbit shells get squashed into a thin, crowded crust against
+  the globe.
+- **Shell view** keeps the same data but remaps altitude onto a logarithmic
+  scale, stretching the first few thousand kilometres so those packed low-orbit
+  **shells** fan out into separate, readable bands. This spacing is a *visual aid,
+  not a real distance* — nothing is actually that far apart. It exists purely to
+  make the shell structure legible.
+
+The shells themselves are real: satellites genuinely cluster into discrete
+altitude bands (the Starlink shells, the Sun-synchronous imaging band, the GPS
+ring, the GEO belt). Shell view just exaggerates the gaps between them so you can
+tell them apart. In either mode you are looking at exactly these regimes:
 
 - the tight, busy band hugging the surface is **LEO**;
 - the lonely middle is **MEO**, with the GPS family looping through it;

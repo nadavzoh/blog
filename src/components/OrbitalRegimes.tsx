@@ -6,7 +6,7 @@ import InteractiveCard from './InteractiveCard';
  * cross-section of concentric shells around Earth.
  *
  * Real altitudes span two orders of magnitude (a few hundred km of LEO up to
- * ~35,786 km for GEO), so — exactly like the viewer's "LEO structure" mode — we
+ * ~35,786 km for GEO), so — exactly like the viewer's "Shell view" mode — we
  * place each shell on a logarithmic radial scale. That keeps the crowded low
  * shells legible while still showing GEO sitting far out. It is a visual aid,
  * not a physical scale.
@@ -81,7 +81,7 @@ export default function OrbitalRegimes() {
   return (
     <InteractiveCard
       title="The orbital regimes, shell by shell"
-      subtitle="Pick a regime to see where it sits and what lives there. Radii use a log scale, just like the viewer's LEO-structure mode."
+      subtitle="Pick a regime to see where it sits and what lives there. Radii use a log scale, just like the viewer's Shell view mode."
     >
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem' }}>
         {REGIMES.map((r) => (

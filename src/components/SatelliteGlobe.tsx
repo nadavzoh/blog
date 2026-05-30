@@ -42,7 +42,7 @@ const ORBIT_SAMPLES = 180;
  * How altitude maps to scene distance.
  *  - `true`: real proportions — LEO hugs the globe, GEO sits far out.
  *  - `compressed`: a visualization aid that exaggerates low altitudes so the
- *    crowded LEO shells spread into visible bands ("LEO structure").
+ *    crowded LEO shells spread into visible bands (the "Shell view" mode).
  */
 type ViewMode = 'true' | 'compressed';
 
@@ -128,7 +128,7 @@ export default function SatelliteGlobe() {
   const [count, setCount] = useState(0);
   const [selected, setSelected] = useState<ParsedSat | null>(null);
 
-  // View mode (true scale vs. compressed "LEO structure"), the control menu's
+  // View mode (true scale vs. compressed "Shell view"), the control menu's
   // open state, and per-layer visibility toggles.
   const [viewMode, setViewMode] = useState<ViewMode>('true');
   const [menuOpen, setMenuOpen] = useState(false);
@@ -721,8 +721,8 @@ export default function SatelliteGlobe() {
                 <div style={{ display: 'flex', gap: '0.35rem' }}>
                   {(
                     [
-                      ['true', 'LEO normal'],
-                      ['compressed', 'LEO structure'],
+                      ['true', 'True scale'],
+                      ['compressed', 'Shell view'],
                     ] as [ViewMode, string][]
                   ).map(([mode, label]) => (
                     <button
@@ -746,6 +746,18 @@ export default function SatelliteGlobe() {
                     </button>
                   ))}
                 </div>
+                <p
+                  style={{
+                    margin: '0.4rem 0 0',
+                    fontSize: '0.7rem',
+                    lineHeight: 1.35,
+                    color: '#a1a1a1',
+                  }}
+                >
+                  {viewMode === 'true'
+                    ? 'True scale: every satellite sits at its real altitude, so the low-orbit shells crowd against the globe.'
+                    : 'Shell view: a non-physical log scale that fans the crowded low-orbit shells out into visible bands. A visual aid, not a real distance.'}
+                </p>
               </div>
 
               <div>
@@ -879,10 +891,10 @@ export default function SatelliteGlobe() {
         Drag to rotate, scroll to zoom. Click a satellite to highlight it, trace
         its orbit, and read its orbital parameters; click empty space or ✕ to
         clear. Use <strong style={{ color: '#ededed' }}>☰ Controls</strong> to
-        switch between <strong style={{ color: '#ededed' }}>LEO normal</strong>{' '}
-        (true altitudes — low orbits hug the globe) and{' '}
-        <strong style={{ color: '#ededed' }}>LEO structure</strong> (a compressed
-        scale that spreads the crowded low-orbit shells into visible bands),
+        switch between <strong style={{ color: '#ededed' }}>True scale</strong>{' '}
+        (real altitudes — low orbits hug the globe) and{' '}
+        <strong style={{ color: '#ededed' }}>Shell view</strong> (a non-physical
+        log scale that spreads the crowded low-orbit shells into visible bands),
         toggle layers on or off, and reset the camera. Positions are propagated
         in your browser with SGP4 (satellite.js) from CelesTrak two-line
         elements. Teal dots are satellites; the globe spins at sidereal rate
