@@ -31,14 +31,57 @@ satellite viewer.
 11. **Tracking Satellites with SGP4** — snapshot to live position (`SatelliteGlobe`)
 12. **Inclination & Ground Tracks** — why orbits lean (`GroundTrack`)
 
+## Design system
+
+A clean, light, card-based design: a soft lavender background, crisp white
+cards, a single confident blue brand colour, `Sora` display headings over
+`Inter` body text, and bundled space-themed cover art. All design tokens live as
+Tailwind v4 theme variables in `src/styles/global.css` (`--color-brand-*`,
+`--color-ink-*`, `--color-line`, …), so the whole look can be retuned from one
+place. The embedded interactive islands keep their own dark "console" styling,
+which reads as intentional contrast on the light page.
+
+## Adding a new post
+
+Adding a post never requires touching any layout or infrastructure code — just
+drop a new `.mdx` file into `src/content/posts/`:
+
+```mdx
+---
+title: 'Your Post Title'
+description: 'One-sentence summary shown on the card and post header.'
+pubDate: 2025-04-01
+order: 13
+---
+
+Write your post here. Import and drop in interactive islands as needed.
+```
+
+Only `title`, `description`, `pubDate` and `order` are required. Everything else
+is optional and has a safe default, so the card grid never breaks:
+
+| Field      | Default                                  |
+| ---------- | ---------------------------------------- |
+| `category` | `Fundamentals` (also used by the filter) |
+| `author`   | `Orbital Notes`                          |
+| `tags`     | `[]`                                     |
+| `cover`    | a bundled cover picked from `order`      |
+| `draft`    | `false`                                  |
+
+To use your own cover image, set `cover: '/covers/your-image.svg'` (any file
+placed in `public/covers/`). Otherwise one of the six bundled `public/covers/`
+illustrations is chosen deterministically from `order`.
+
 ## Project structure
 
 ```text
+public/covers/       # Bundled space-themed cover art (SVG)
 src/
 ├── components/      # React island components (the interactive viz)
 ├── content/posts/   # MDX posts (the content collection)
 ├── layouts/         # Astro page + post layouts
-├── pages/           # Routes (home, about, dynamic post route)
+├── lib/             # Small helpers (cover resolution, formatting)
+├── pages/           # Routes (home, about, viewer, dynamic post route)
 ├── styles/          # Tailwind v4 entry + global styles
 └── content.config.ts
 ```

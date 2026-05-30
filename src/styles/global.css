@@ -1,72 +1,163 @@
 @import 'tailwindcss';
 @import 'katex/dist/katex.min.css';
 
-/* Tailwind v4 theme tokens — clean, neutral, Vercel/shadcn-inspired palette. */
+/*
+ * Orbital Notes — light, card-based design system.
+ *
+ * Inspired by a clean editorial blog: soft lavender-tinted background, crisp
+ * white cards, a single confident blue brand colour, and generous rounding.
+ * Tokens are exposed as Tailwind v4 theme variables so utilities like
+ * `bg-brand-500`, `text-ink-700`, `border-line` are available everywhere.
+ */
 @theme {
-  /* Surfaces: near-black page with subtle neutral steps. */
-  --color-surface-950: #0a0a0a;
-  --color-surface-900: #111111;
-  --color-surface-800: #1a1a1a;
-  --color-surface-700: #262626;
-  --color-surface-600: #404040;
+  /* Page + surfaces */
+  --color-bg: #e9edf8;
+  --color-bg-soft: #eff2fb;
+  --color-card: #ffffff;
+  --color-line: #e3e7f2;
+  --color-line-strong: #d3d9ea;
 
-  /* Text: high-contrast neutral ink. */
-  --color-ink-50: #ededed;
-  --color-ink-200: #d4d4d4;
-  --color-ink-400: #a1a1a1;
+  /* Ink / text */
+  --color-ink-900: #0e1626;
+  --color-ink-700: #313c52;
+  --color-ink-500: #5b667d;
+  --color-ink-400: #8a93a8;
 
-  /* Accents: a single restrained blue plus a teal for data. */
-  --color-accent-400: #60a5fa;
-  --color-accent-500: #3b82f6;
-  --color-teal-400: #2dd4bf;
-  --color-teal-500: #14b8a6;
-  --color-amber-400: #fbbf24;
+  /* Brand (blue) */
+  --color-brand-50: #eef3ff;
+  --color-brand-100: #dde7ff;
+  --color-brand-200: #c2d4ff;
+  --color-brand-400: #5b8cff;
+  --color-brand-500: #2f6bff;
+  --color-brand-600: #1f53e6;
+  --color-brand-700: #1741b8;
+
+  /* Supporting accent for data/series chrome */
+  --color-accent-500: #0ea5a5;
 
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Sora', 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  --radius-card: 1.25rem;
 }
 
 html {
-  color-scheme: dark;
+  color-scheme: light;
   scroll-behavior: smooth;
 }
 
 body {
-  background: var(--color-surface-950);
-  color: var(--color-ink-50);
+  background-color: var(--color-bg);
+  background-image:
+    radial-gradient(1200px 600px at 50% -10%, #f6f8ff 0%, transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, #eaf0ff 0%, transparent 55%);
+  background-attachment: fixed;
+  color: var(--color-ink-900);
   font-family: var(--font-sans);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-/* Very subtle starfield — kept faint so it reads as texture, not decoration. */
-.starfield::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background-image:
-    radial-gradient(1px 1px at 20% 30%, rgba(255, 255, 255, 0.18), transparent),
-    radial-gradient(1px 1px at 70% 60%, rgba(255, 255, 255, 0.12), transparent),
-    radial-gradient(1px 1px at 40% 80%, rgba(255, 255, 255, 0.14), transparent),
-    radial-gradient(1px 1px at 90% 20%, rgba(255, 255, 255, 0.12), transparent),
-    radial-gradient(1px 1px at 50% 50%, rgba(255, 255, 255, 0.1), transparent);
-  background-size: 100% 100%;
+/* Reusable card surface. */
+.card {
+  background: var(--color-card);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 12px 30px -20px rgba(15, 23, 42, 0.25);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    border-color 0.18s ease;
+}
+.card-hover:hover {
+  transform: translateY(-3px);
+  border-color: var(--color-line-strong);
+  box-shadow:
+    0 2px 4px rgba(15, 23, 42, 0.05),
+    0 24px 48px -24px rgba(31, 83, 230, 0.35);
 }
 
-/* Prose styling for MDX content */
+/* Category pill. */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  background: var(--color-brand-50);
+  color: var(--color-brand-600);
+  border: 1px solid var(--color-brand-100);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  padding: 0.18rem 0.6rem;
+  white-space: nowrap;
+}
+
+/* Cover frame keeps every image the same aspect ratio so a missing or odd
+ * image never distorts a card. */
+.cover {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  object-fit: cover;
+  background: var(--color-bg-soft);
+}
+
+/* Small round "open" affordance in the card footer, like the reference. */
+.open-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 2rem;
+  width: 2rem;
+  border-radius: 9999px;
+  border: 1px solid var(--color-line);
+  color: var(--color-ink-500);
+  transition:
+    background 0.16s ease,
+    color 0.16s ease,
+    border-color 0.16s ease;
+}
+.group:hover .open-dot {
+  background: var(--color-brand-500);
+  border-color: var(--color-brand-500);
+  color: #fff;
+}
+
+/* Filter tab buttons. */
+.tab {
+  border-radius: 9999px;
+  padding: 0.4rem 0.95rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-ink-500);
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+.tab:hover {
+  color: var(--color-ink-900);
+}
+.tab[aria-selected='true'] {
+  background: var(--color-ink-900);
+  color: #fff;
+}
+
+/* Prose styling for MDX content (light theme). */
 .prose {
   line-height: 1.75;
   font-size: 1.05rem;
+  color: var(--color-ink-700);
 }
 .prose h1,
 .prose h2,
 .prose h3 {
-  color: var(--color-ink-50);
+  color: var(--color-ink-900);
+  font-family: var(--font-display);
   font-weight: 700;
   line-height: 1.2;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
   margin-top: 2.2rem;
   margin-bottom: 0.9rem;
 }
@@ -78,16 +169,16 @@ body {
 }
 .prose p {
   margin: 1rem 0;
-  color: var(--color-ink-200);
+  color: var(--color-ink-700);
 }
 .prose a {
-  color: var(--color-accent-400);
+  color: var(--color-brand-600);
   text-decoration: underline;
   text-underline-offset: 3px;
   transition: color 0.15s ease;
 }
 .prose a:hover {
-  color: var(--color-accent-500);
+  color: var(--color-brand-700);
 }
 .prose ul,
 .prose ol {
@@ -96,7 +187,7 @@ body {
 }
 .prose li {
   margin: 0.4rem 0;
-  color: var(--color-ink-200);
+  color: var(--color-ink-700);
 }
 .prose ul {
   list-style: disc;
@@ -105,24 +196,25 @@ body {
   list-style: decimal;
 }
 .prose strong {
-  color: var(--color-ink-50);
+  color: var(--color-ink-900);
 }
 .prose code {
-  background: var(--color-surface-800);
-  border: 1px solid var(--color-surface-700);
+  background: var(--color-bg-soft);
+  border: 1px solid var(--color-line);
   padding: 0.15rem 0.4rem;
   border-radius: 0.35rem;
   font-size: 0.9em;
+  color: var(--color-ink-900);
 }
 .prose blockquote {
-  border-left: 2px solid var(--color-surface-600);
+  border-left: 3px solid var(--color-brand-200);
   padding-left: 1rem;
   margin: 1.2rem 0;
-  color: var(--color-ink-400);
+  color: var(--color-ink-500);
   font-style: italic;
 }
 .prose hr {
   border: none;
-  border-top: 1px solid var(--color-surface-800);
+  border-top: 1px solid var(--color-line);
   margin: 2.5rem 0;
 }

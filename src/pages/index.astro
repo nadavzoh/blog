@@ -1,56 +1,243 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
+import { coverFor, formatDate, categoriesOf } from '../lib/posts';
+
+const base = import.meta.env.BASE_URL;
 
 const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort(
   (a, b) => a.data.order - b.data.order,
 );
+
+const featured = posts.slice(0, 2);
+const categories = categoriesOf(posts);
+
+const href = (id: string) => `${base}posts/${id}/`;
 ---
 
-<BaseLayout title="Orbital Notes — Space & Orbit Physics, Explained">
-  <section class="mb-12">
-    <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
-      A friendly tour of orbital physics
-    </h1>
-    <p class="mt-4 max-w-2xl text-lg text-ink-400">
-      No physics degree required. We start from <em>"what even is gravity?"</em> and build,
-      one post at a time, to how spacecraft actually move between worlds — with
-      interactive simulations you can poke at along the way.
+<BaseLayout title="Orbital Notes — Space & Orbit Physics, Explained" wide>
+  {/* Hero */}
+  <section class="py-10 text-center sm:py-16">
+    <p class="text-sm font-semibold uppercase tracking-wider text-brand-600">
+      Interactive space physics, from scratch
     </p>
+    <h1
+      class="mx-auto mt-4 max-w-3xl text-4xl font-extrabold leading-[1.1] tracking-tight text-ink-900 sm:text-5xl"
+      style="font-family: var(--font-display)"
+    >
+      Understand how things really fly through space.
+    </h1>
+    <p class="mx-auto mt-5 max-w-2xl text-lg text-ink-500">
+      No physics degree required. We start from <em>"what even is gravity?"</em> and build,
+      one post at a time, to how spacecraft move between worlds — with simulations you can
+      poke at along the way.
+    </p>
+    <form
+      class="demo-form mx-auto mt-8 flex max-w-md items-center gap-2"
+     
+      aria-label="Subscribe (demo)"
+    >
+      <input
+        type="email"
+        placeholder="Your email"
+        class="h-11 flex-1 rounded-full border border-line bg-card px-4 text-sm text-ink-900 outline-none placeholder:text-ink-400 focus:border-brand-400"
+      />
+      <button
+        type="submit"
+        class="h-11 rounded-full bg-brand-500 px-5 text-sm font-semibold text-white transition hover:bg-brand-600"
+      >
+        Subscribe
+      </button>
+    </form>
   </section>
 
-  <section>
-    <h2 class="mb-5 text-sm font-semibold uppercase tracking-wider text-teal-400">
-      The series
+  {/* Featured */}
+  <section class="mt-6 grid gap-6 sm:grid-cols-2">
+    {
+      featured.map((post) => (
+        <a href={href(post.id)} class="group card card-hover flex flex-col overflow-hidden sm:flex-row">
+          <img src={coverFor(post, base)} alt="" class="cover sm:w-2/5" loading="lazy" />
+          <div class="flex flex-1 flex-col p-5">
+            <div class="flex items-center justify-between gap-3 text-xs text-ink-400">
+              <time datetime={post.data.pubDate.toISOString()}>
+                {formatDate(post.data.pubDate)}
+              </time>
+              <span class="badge">{post.data.category}</span>
+            </div>
+            <h3 class="mt-3 text-lg font-bold leading-snug text-ink-900 transition group-hover:text-brand-600">
+              {post.data.title}
+            </h3>
+            <p class="mt-2 line-clamp-2 text-sm text-ink-500">{post.data.description}</p>
+            <div class="mt-auto flex items-center justify-between pt-4 text-sm text-ink-500">
+              <span>{post.data.author}</span>
+              <span class="open-dot" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <path d="M7 17 17 7M9 7h8v8" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </span>
+            </div>
+          </div>
+        </a>
+      ))
+    }
+  </section>
+
+  {/* Articles grid */}
+  <section id="blogs" class="mt-20 scroll-mt-24">
+    <p class="text-sm font-semibold uppercase tracking-wider text-brand-600">Articles</p>
+    <h2
+      class="mt-2 text-3xl font-bold tracking-tight text-ink-900 sm:text-4xl"
+      style="font-family: var(--font-display)"
+    >
+      The whole series, in order.
     </h2>
-    <ol class="space-y-4">
+    <p class="mt-3 max-w-2xl text-ink-500">
+      Practical, interactive explainers to take you from first principles to live satellite
+      tracking. Filter by topic or search for one.
+    </p>
+
+    <div class="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div id="filters" class="flex flex-wrap gap-1.5 rounded-full border border-line bg-card p-1.5">
+        <button class="tab" data-filter="all" aria-selected="true">All</button>
+        {
+          categories.map((cat) => (
+            <button class="tab" data-filter={cat} aria-selected="false">
+              {cat}
+            </button>
+          ))
+        }
+      </div>
+      <div class="relative sm:w-64">
+        <svg
+          class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-400"
+          width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        >
+          <circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" stroke-linecap="round" />
+        </svg>
+        <input
+          id="search"
+          type="search"
+          placeholder="Search articles…"
+          class="h-10 w-full rounded-full border border-line bg-card pl-9 pr-4 text-sm text-ink-900 outline-none placeholder:text-ink-400 focus:border-brand-400"
+        />
+      </div>
+    </div>
+
+    <ul id="grid" class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {
         posts.map((post) => (
-          <li>
-            <a
-              href={`${import.meta.env.BASE_URL}posts/${post.id}/`}
-              class="group block rounded-xl border border-surface-800 bg-surface-900/50 p-5 transition hover:border-surface-600 hover:bg-surface-800/50"
-            >
-              <div class="flex items-baseline gap-3">
-                <span class="text-sm font-bold text-accent-400">
-                  {String(post.data.order).padStart(2, '0')}
+          <li
+            class="post-card"
+            data-category={post.data.category}
+            data-search={`${post.data.title} ${post.data.description} ${post.data.tags.join(' ')}`.toLowerCase()}
+          >
+            <a href={href(post.id)} class="group card card-hover flex h-full flex-col overflow-hidden">
+              <div class="relative">
+                <img src={coverFor(post, base)} alt="" class="cover" loading="lazy" />
+                <span class="badge absolute left-3 top-3 bg-white/90 backdrop-blur">
+                  {post.data.category}
                 </span>
-                <h3 class="text-lg font-bold text-ink-50 transition group-hover:text-accent-400">
+              </div>
+              <div class="flex flex-1 flex-col p-5">
+                <div class="flex items-center gap-2 text-xs text-ink-400">
+                  <span class="font-semibold text-brand-600">
+                    {String(post.data.order).padStart(2, '0')}
+                  </span>
+                  <span aria-hidden="true">•</span>
+                  <time datetime={post.data.pubDate.toISOString()}>
+                    {formatDate(post.data.pubDate)}
+                  </time>
+                </div>
+                <h3 class="mt-2 text-base font-bold leading-snug text-ink-900 transition group-hover:text-brand-600">
                   {post.data.title}
                 </h3>
-              </div>
-              <p class="mt-1.5 pl-8 text-ink-400">{post.data.description}</p>
-              <div class="mt-2 flex flex-wrap gap-2 pl-8">
-                {post.data.tags.map((tag) => (
-                  <span class="rounded-full bg-surface-800 px-2 py-0.5 text-xs text-ink-400">
-                    #{tag}
+                <p class="mt-2 line-clamp-2 text-sm text-ink-500">{post.data.description}</p>
+                <div class="mt-auto flex items-center justify-between pt-4 text-sm text-ink-500">
+                  <span>{post.data.author}</span>
+                  <span class="open-dot" aria-hidden="true">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                      <path d="M7 17 17 7M9 7h8v8" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
                   </span>
-                ))}
+                </div>
               </div>
             </a>
           </li>
         ))
       }
-    </ol>
+    </ul>
+    <p id="empty" class="mt-10 hidden text-center text-ink-400">No articles match your search.</p>
+  </section>
+
+  {/* Newsletter CTA */}
+  <section class="mt-20">
+    <div class="card grid items-stretch gap-0 overflow-hidden md:grid-cols-2">
+      <img src={`${base}covers/cta.svg`} alt="" class="h-full w-full object-cover" />
+      <div class="flex flex-col justify-center p-8 sm:p-10">
+        <h2
+          class="text-2xl font-bold leading-snug text-ink-900 sm:text-3xl"
+          style="font-family: var(--font-display)"
+        >
+          Explore the cosmos, one orbit at a time.
+        </h2>
+        <p class="mt-3 text-ink-500">
+          New interactive explainers on gravity, orbits and satellites. Drop your email and
+          follow the series from the very first post.
+        </p>
+        <form class="demo-form mt-6 flex max-w-md items-center gap-2">
+          <input
+            type="email"
+            placeholder="Your email"
+            class="h-11 flex-1 rounded-full border border-line bg-card px-4 text-sm text-ink-900 outline-none placeholder:text-ink-400 focus:border-brand-400"
+          />
+          <button
+            type="submit"
+            class="h-11 rounded-full bg-brand-500 px-5 text-sm font-semibold text-white transition hover:bg-brand-600"
+          >
+            Subscribe
+          </button>
+        </form>
+      </div>
+    </div>
   </section>
 </BaseLayout>
+
+<script>
+  // Lightweight, dependency-free filter + search for the article grid.
+  const filters = document.getElementById('filters');
+  const search = document.getElementById('search') as HTMLInputElement | null;
+  const cards = Array.from(document.querySelectorAll<HTMLElement>('.post-card'));
+  const empty = document.getElementById('empty');
+  let active = 'all';
+
+  function apply() {
+    const q = (search?.value ?? '').trim().toLowerCase();
+    let visible = 0;
+    for (const card of cards) {
+      const cat = card.dataset.category ?? '';
+      const hay = card.dataset.search ?? '';
+      const matchCat = active === 'all' || cat === active;
+      const matchSearch = q === '' || hay.includes(q);
+      const show = matchCat && matchSearch;
+      card.style.display = show ? '' : 'none';
+      if (show) visible++;
+    }
+    empty?.classList.toggle('hidden', visible !== 0);
+  }
+
+  filters?.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-filter]');
+    if (!btn) return;
+    active = btn.dataset.filter ?? 'all';
+    filters
+      .querySelectorAll('[data-filter]')
+      .forEach((b) => b.setAttribute('aria-selected', b === btn ? 'true' : 'false'));
+    apply();
+  });
+  search?.addEventListener('input', apply);
+
+  // Demo subscribe forms: prevent navigation/reload (no backend here).
+  document.querySelectorAll<HTMLFormElement>('form.demo-form').forEach((form) => {
+    form.addEventListener('submit', (e) => e.preventDefault());
+  });
+</script>
