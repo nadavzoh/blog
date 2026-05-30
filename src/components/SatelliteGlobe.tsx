@@ -30,6 +30,88 @@ const GROUPS: { id: string; label: string }[] = [
 const MAX_SATS = 4000;
 
 /**
+ * Resilient-fetch settings for the CelesTrak request.
+ *
+ * Every group hits the same `gp.php` endpoint, but the large groups (Starlink,
+ * all active) return multi-megabyte payloads. Those big requests are the ones
+ * most likely to be throttled by CelesTrak's per-IP rate limiting or to fail /
+ * time out mid-transfer, which is why the offline fallback used to appear
+ * "only on Starlink and all satellites". To make the viewer always work we
+ * cache each group's last good response, retry transient failures with
+ * backoff, and prefer stale cache over the tiny bundled snapshot.
+ */
+const CACHE_PREFIX = 'satglobe:tle:';
+/** How long a cached response is considered fresh. CelesTrak asks clients to
+ *  cache and avoid re-requesting the same data frequently. */
+const CACHE_TTL_MS = 2 * 60 * 60 * 1000; // 2 hours
+/** Number of network attempts before giving up on a group's live request. */
+const FETCH_RETRIES = 3;
+/** Per-request timeout — large groups need a generous window to download. */
+const FETCH_TIMEOUT_MS = 20_000;
+
+interface CacheEntry {
+  text: string;
+  ts: number;
+}
+
+/** Read a cached TLE response for a group, or `null` if absent/unreadable. */
+function readTleCache(group: string): CacheEntry | null {
+  try {
+    const raw = localStorage.getItem(CACHE_PREFIX + group);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as CacheEntry;
+    if (typeof parsed?.text !== 'string' || typeof parsed?.ts !== 'number') return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+/** Persist a group's TLE response. Best-effort: storage may be full/disabled. */
+function writeTleCache(group: string, text: string): void {
+  try {
+    localStorage.setItem(CACHE_PREFIX + group, JSON.stringify({ text, ts: Date.now() }));
+  } catch {
+    /* ignore — caching is an optimisation, not a requirement */
+  }
+}
+
+/** True when the text contains at least one well-formed TLE line 1. CelesTrak
+ *  serves short plain-text errors ("Invalid query…", rate-limit notices) with a
+ *  200 status, so we treat anything without real records as a failed request. */
+function looksLikeTle(text: string): boolean {
+  return /(^|\n)1 \d{5}/.test(text);
+}
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * Fetch TLE text with a per-request timeout and exponential-backoff retries.
+ * Resolves with the response body, or throws once every attempt is exhausted.
+ */
+async function fetchTleWithRetry(url: string, isCancelled: () => boolean): Promise<string> {
+  let lastErr: unknown = new Error('fetch failed');
+  for (let attempt = 0; attempt < FETCH_RETRIES; attempt++) {
+    if (isCancelled()) throw new Error('cancelled');
+    if (attempt > 0) await sleep(500 * 2 ** (attempt - 1));
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+    try {
+      const r = await fetch(url, { signal: controller.signal });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const text = await r.text();
+      if (!looksLikeTle(text)) throw new Error('no records');
+      return text;
+    } catch (err) {
+      lastErr = err;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+  throw lastErr;
+}
+
+/**
  * Satellite categories used to colour-code the point cloud. A satellite is
  * classified purely from its CelesTrak name, so the same colours apply whether
  * you load a single group or the whole active catalogue. Order matters: the
@@ -265,6 +347,7 @@ export default function SatelliteGlobe() {
   // --- Fetch TLEs whenever the selected group changes. ---
   useEffect(() => {
     let cancelled = false;
+    const isCancelled = () => cancelled;
     setStatus('loading');
     // A new group means the previous selection no longer applies.
     setSelected(null);
@@ -273,28 +356,46 @@ export default function SatelliteGlobe() {
       group,
     )}&FORMAT=tle`;
 
-    fetch(url)
-      .then((r) => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.text();
-      })
-      .then((text) => {
+    // Apply a TLE response to the scene. Returns false (without mutating state)
+    // when the text yields no usable records, so callers can try the next source.
+    const apply = (text: string, live: boolean): boolean => {
+      const parsed = parseTle(text).slice(0, MAX_SATS);
+      if (parsed.length === 0) return false;
+      satsRef.current = parsed;
+      setCount(parsed.length);
+      setLegend(buildLegend(parsed));
+      setStatus(live ? 'live' : 'fallback');
+      return true;
+    };
+
+    (async () => {
+      const cached = readTleCache(group);
+
+      // 1. Fresh cache wins. Reusing it avoids re-hitting CelesTrak's rate limit
+      //    when switching back to a group that was already loaded.
+      if (cached && Date.now() - cached.ts < CACHE_TTL_MS && apply(cached.text, true)) {
+        return;
+      }
+
+      // 2. Live request with retries/backoff for transient throttling.
+      try {
+        const text = await fetchTleWithRetry(url, isCancelled);
         if (cancelled) return;
-        const parsed = parseTle(text);
-        if (parsed.length === 0) throw new Error('no records');
-        satsRef.current = parsed.slice(0, MAX_SATS);
-        setCount(satsRef.current.length);
-        setLegend(buildLegend(satsRef.current));
-        setStatus('live');
-      })
-      .catch(() => {
-        if (cancelled) return;
-        const parsed = parseTle(FALLBACK_TLE);
-        satsRef.current = parsed;
-        setCount(parsed.length);
-        setLegend(buildLegend(parsed));
-        setStatus('fallback');
-      });
+        if (apply(text, true)) {
+          writeTleCache(group, text);
+          return;
+        }
+      } catch {
+        /* fall through to stale cache / bundled fallback */
+      }
+      if (cancelled) return;
+
+      // 3. Stale cache is real catalogue data — prefer it over the snapshot.
+      if (cached && apply(cached.text, true)) return;
+
+      // 4. Last resort: the tiny bundled offline set.
+      apply(FALLBACK_TLE, false);
+    })();
 
     return () => {
       cancelled = true;
