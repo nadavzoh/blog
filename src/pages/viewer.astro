@@ -6,20 +6,21 @@ import SatelliteGlobe from '../components/SatelliteGlobe.tsx';
 <BaseLayout
   title="Live Satellite Viewer — Orbital Notes"
   description="A real-time 3D view of satellites orbiting Earth, propagated in your browser from live CelesTrak data."
+  wide
 >
   <section class="mb-8">
-    <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
+    <h1 class="text-3xl font-extrabold tracking-tight text-ink-900 sm:text-4xl" style="font-family: var(--font-display)">
       Live satellite viewer
     </h1>
-    <p class="mt-4 max-w-2xl text-lg text-ink-400">
+    <p class="mt-4 max-w-2xl text-lg text-ink-500">
       Everything you read about in the series, made literal. This globe pulls
       live orbital elements from <a
-        class="text-accent-400 hover:text-accent-500"
+        class="text-brand-600 hover:text-brand-700"
         href="https://celestrak.org/"
         target="_blank"
         rel="noopener">CelesTrak</a
       > and propagates each satellite in your browser with the
-      <strong class="text-ink-50">SGP4</strong> model — the same math used by mission
+      <strong class="text-ink-900">SGP4</strong> model — the same math used by mission
       controllers — to place thousands of objects in real time.
     </p>
   </section>
